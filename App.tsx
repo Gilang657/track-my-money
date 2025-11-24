@@ -490,13 +490,23 @@ const App = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 1. Check active session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    });
+    const initSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+            console.warn("Supabase auth error (likely missing keys):", error.message);
+            // If keys are missing, we stop loading but don't have a session, so it shows AuthPage
+        }
+        setSession(session);
+      } catch (err) {
+        console.error("Session init failed:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    // 2. Listen for auth changes
+    initSession();
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
