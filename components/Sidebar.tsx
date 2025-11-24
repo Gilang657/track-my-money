@@ -2,6 +2,8 @@ import React from 'react';
 import { LayoutDashboard, Receipt, Settings, CreditCard, LogOut } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 import { Language } from '../types';
+import { supabase } from '../lib/supabaseClient';
+import { financeService } from '../services/financeService';
 
 type View = 'overview' | 'transactions' | 'budgeting' | 'settings';
 
@@ -19,11 +21,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, onNavigate, mobile
   const lang = profile?.language || 'en';
   
   const labels = {
-    en: { overview: 'Overview', transactions: 'Transactions', budgeting: 'Budgeting', settings: 'Settings' },
-    id: { overview: 'Ringkasan', transactions: 'Transaksi', budgeting: 'Anggaran', settings: 'Pengaturan' }
+    en: { overview: 'Overview', transactions: 'Transactions', budgeting: 'Budgeting', settings: 'Settings', signOut: 'Sign Out' },
+    id: { overview: 'Ringkasan', transactions: 'Transaksi', budgeting: 'Anggaran', settings: 'Pengaturan', signOut: 'Keluar' }
   };
   
   const t = labels[lang];
+
+  const handleLogout = async () => {
+    try {
+        await supabase.auth.signOut();
+        financeService.clearLocalSession();
+        // Force refresh to clear state
+        window.location.reload();
+    } catch (error) {
+        console.error("Logout failed", error);
+    }
+  };
 
   const NavContent = (
     <>
@@ -64,6 +77,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, onNavigate, mobile
              </button>
          </div>
          {NavContent}
+         
+         <div className="mt-auto pt-6 border-t border-zinc-800">
+            <button 
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-red-500 bg-red-500/10 hover:bg-red-500/20 transition-all"
+            >
+                <LogOut size={20} />
+                {t.signOut}
+            </button>
+         </div>
       </div>
     );
   }
@@ -81,17 +104,27 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, onNavigate, mobile
         {NavContent}
       </nav>
 
-      {/* User Profile Section - Connected to Global State */}
-      <div className="p-4 m-4 rounded-xl bg-gradient-to-br from-zinc-900 to-zinc-950 border border-zinc-800 group cursor-pointer hover:border-zinc-700 hover:shadow-lg transition-all duration-300">
-         <div className="flex items-center gap-3">
-           <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center font-bold text-black group-hover:bg-orange-400 group-hover:scale-110 transition-all duration-300">
-             {profile?.name.charAt(0).toUpperCase() || 'U'}
+      <div className="px-4 pb-4">
+        {/* User Profile Section - Connected to Global State */}
+        <div className="p-4 rounded-xl bg-gradient-to-br from-zinc-900 to-zinc-950 border border-zinc-800 group cursor-pointer hover:border-zinc-700 hover:shadow-lg transition-all duration-300">
+           <div className="flex items-center gap-3 mb-3">
+             <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center font-bold text-black group-hover:bg-orange-400 group-hover:scale-110 transition-all duration-300">
+               {profile?.name.charAt(0).toUpperCase() || 'U'}
+             </div>
+             <div className="overflow-hidden">
+               <p className="text-sm font-medium text-white truncate group-hover:text-orange-500 transition-colors">{profile?.name || 'User'}</p>
+               <p className="text-xs text-zinc-500 truncate">Premium Plan</p>
+             </div>
            </div>
-           <div className="overflow-hidden">
-             <p className="text-sm font-medium text-white truncate group-hover:text-orange-500 transition-colors">{profile?.name || 'User'}</p>
-             <p className="text-xs text-zinc-500 truncate">Premium Plan</p>
-           </div>
-         </div>
+           
+           <button 
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center gap-2 py-2 text-xs font-medium text-zinc-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+           >
+               <LogOut size={14} />
+               {t.signOut}
+           </button>
+        </div>
       </div>
     </aside>
   );
