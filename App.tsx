@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useMemo } from 'react';
 import { Menu, Bell, Loader2, CheckCircle2 } from 'lucide-react';
 import { DashboardStats } from './components/DashboardStats';
@@ -15,7 +16,7 @@ import { Transaction, DashboardStats as StatsType, UserProfile, CurrencyCode, Bu
 import { TRANSLATIONS } from './constants';
 import { Card, CardContent, CardHeader, CardTitle, Button, Input, Switch, Badge } from './components/ui/DesignSystem';
 import { UserProvider, useUser } from './contexts/UserContext';
-import { supabase } from './lib/supabase';
+import { supabase } from './lib/supabase'; // UPDATED IMPORT
 import { Session } from '@supabase/supabase-js';
 
 type View = 'overview' | 'transactions' | 'budgeting' | 'settings';
@@ -173,15 +174,16 @@ const AppContent = () => {
       <div className="flex flex-col lg:flex-row gap-6 h-full min-h-[500px]">
         {/* Settings Sidebar */}
         <div className="w-full lg:w-64 flex flex-col gap-1">
-          {['account', 'preferences', 'notifications', 'data'].map(tab => (
+          {['account', 'preferences', 'notifications', 'data'].map((tab, idx) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`text-left px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+              className={`text-left px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${
                 activeTab === tab 
-                  ? 'bg-zinc-800 text-white border-l-2 border-orange-500' 
-                  : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
+                  ? 'bg-zinc-800 text-white border-l-2 border-orange-500 pl-6 shadow-lg shadow-black/20' 
+                  : 'text-zinc-400 hover:text-white hover:bg-zinc-900 hover:pl-5'
               }`}
+              style={{ transitionDelay: `${idx * 50}ms` }}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
@@ -190,7 +192,7 @@ const AppContent = () => {
 
         {/* Settings Content */}
         <div className="flex-1 space-y-6">
-          <form onSubmit={handleSave} className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+          <form onSubmit={handleSave} className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500 ease-out">
              
              {activeTab === 'account' && (
                <Card>
@@ -199,7 +201,7 @@ const AppContent = () => {
                  </CardHeader>
                  <CardContent className="space-y-4">
                     <div className="flex items-center gap-4 mb-6">
-                       <div className="w-20 h-20 rounded-full bg-zinc-800 flex items-center justify-center text-2xl font-bold text-orange-500 border-2 border-orange-500/20 shadow-lg shadow-orange-500/10">
+                       <div className="w-20 h-20 rounded-full bg-zinc-800 flex items-center justify-center text-2xl font-bold text-orange-500 border-2 border-orange-500/20 shadow-lg shadow-orange-500/10 transition-transform hover:scale-105 duration-300">
                           {formState.name ? formState.name.charAt(0).toUpperCase() : 'U'}
                        </div>
                        <div>
@@ -232,7 +234,7 @@ const AppContent = () => {
                     <CardTitle>{t.preferences}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                      <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-900/50 border border-zinc-800/50">
+                      <div className="flex items-center justify-between p-4 rounded-xl bg-zinc-900/50 border border-zinc-800/50 hover:border-zinc-700 transition-colors">
                         <div>
                           <h4 className="font-medium text-white">{t.currency}</h4>
                           <p className="text-xs text-zinc-500 mt-1">Updates transaction values automatically.</p>
@@ -248,7 +250,7 @@ const AppContent = () => {
                         </select>
                       </div>
 
-                      <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-900/50 border border-zinc-800/50">
+                      <div className="flex items-center justify-between p-4 rounded-xl bg-zinc-900/50 border border-zinc-800/50 hover:border-zinc-700 transition-colors">
                         <div>
                           <h4 className="font-medium text-white">{t.language}</h4>
                         </div>
@@ -271,7 +273,7 @@ const AppContent = () => {
                       <CardTitle>Notifications</CardTitle>
                    </CardHeader>
                    <CardContent className="space-y-4">
-                      <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-900/50 border border-zinc-800/50">
+                      <div className="flex items-center justify-between p-4 rounded-xl bg-zinc-900/50 border border-zinc-800/50 hover:border-zinc-700 transition-colors">
                         <div>
                           <h4 className="font-medium text-white">Email Alerts</h4>
                           <p className="text-xs text-zinc-500">Receive weekly spending summaries</p>
@@ -281,7 +283,7 @@ const AppContent = () => {
                             onCheckedChange={(c) => handleToggle('emailAlerts', c)}
                         />
                       </div>
-                      <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-900/50 border border-zinc-800/50">
+                      <div className="flex items-center justify-between p-4 rounded-xl bg-zinc-900/50 border border-zinc-800/50 hover:border-zinc-700 transition-colors">
                         <div>
                           <h4 className="font-medium text-white">Monthly Report</h4>
                           <p className="text-xs text-zinc-500">Get a detailed analysis at month end</p>
@@ -332,60 +334,69 @@ const AppContent = () => {
 
   // --- Render Router ---
   const renderContent = () => {
-    switch (activeView) {
-      case 'overview':
-        return (
-          <>
-            <DashboardStats stats={stats} formatCurrency={formatCurrency} labels={t} />
-            <Analytics transactions={filteredTransactions} labels={t} formatCurrency={formatCurrency} />
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-               <div className="xl:col-span-2 order-2 xl:order-1">
-                  <TransactionList transactions={filteredTransactions.slice(0, 5)} onDelete={handleDeleteTransaction} formatCurrency={formatCurrency} labels={t} />
+    // We add a key here to trigger the animation on view change
+    const content = (() => {
+      switch (activeView) {
+        case 'overview':
+          return (
+            <div className="space-y-6">
+              <DashboardStats stats={stats} formatCurrency={formatCurrency} labels={t} />
+              <Analytics transactions={filteredTransactions} labels={t} formatCurrency={formatCurrency} />
+              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                 <div className="xl:col-span-2 order-2 xl:order-1">
+                    <TransactionList transactions={filteredTransactions.slice(0, 5)} onDelete={handleDeleteTransaction} formatCurrency={formatCurrency} labels={t} />
+                 </div>
+                 <div className="xl:col-span-1 order-1 xl:order-2">
+                    <TransactionForm 
+                      onAdd={handleAddTransaction} 
+                      loading={actionLoading} 
+                      labels={t} 
+                      categories={activeCategories} 
+                      currency={profile!.currency}
+                    />
+                 </div>
+              </div>
+            </div>
+          );
+        case 'transactions':
+          return (
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 h-full">
+               <div className="xl:col-span-2 order-2 xl:order-1 h-full">
+                  <TransactionList transactions={filteredTransactions} onDelete={handleDeleteTransaction} formatCurrency={formatCurrency} labels={t} />
                </div>
                <div className="xl:col-span-1 order-1 xl:order-2">
                   <TransactionForm 
-                    onAdd={handleAddTransaction} 
-                    loading={actionLoading} 
-                    labels={t} 
-                    categories={activeCategories} 
-                    currency={profile!.currency}
+                      onAdd={handleAddTransaction} 
+                      loading={actionLoading} 
+                      labels={t} 
+                      categories={activeCategories}
+                      currency={profile!.currency}
                   />
                </div>
             </div>
-          </>
-        );
-      case 'transactions':
-        return (
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 h-full">
-             <div className="xl:col-span-2 order-2 xl:order-1 h-full">
-                <TransactionList transactions={filteredTransactions} onDelete={handleDeleteTransaction} formatCurrency={formatCurrency} labels={t} />
-             </div>
-             <div className="xl:col-span-1 order-1 xl:order-2">
-                <TransactionForm 
-                    onAdd={handleAddTransaction} 
-                    loading={actionLoading} 
-                    labels={t} 
-                    categories={activeCategories}
-                    currency={profile!.currency}
-                />
-             </div>
-          </div>
-        );
-      case 'budgeting':
-        return (
-          <BudgetView 
-            transactions={filteredTransactions}
-            budgetLimits={budgetLimits}
-            onUpdateLimits={handleUpdateBudgets}
-            formatCurrency={formatCurrency}
-            labels={t}
-          />
-        );
-      case 'settings':
-        return <SettingsView />;
-      default:
-        return null;
-    }
+          );
+        case 'budgeting':
+          return (
+            <BudgetView 
+              transactions={filteredTransactions}
+              budgetLimits={budgetLimits}
+              onUpdateLimits={handleUpdateBudgets}
+              formatCurrency={formatCurrency}
+              labels={t}
+            />
+          );
+        case 'settings':
+          return <SettingsView />;
+        default:
+          return null;
+      }
+    })();
+
+    return (
+      <div key={activeView} className="animate-in fade-in slide-in-from-bottom-8 duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1)]">
+        {content}
+      </div>
+    );
   };
 
   // --- Global Loading (User Profile) ---
@@ -401,7 +412,7 @@ const AppContent = () => {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-orange-500/30">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-orange-500/30 overflow-x-hidden">
       
       {/* Onboarding Wizard - Shown if incomplete */}
       {!profile.onboardingCompleted && (
@@ -416,7 +427,7 @@ const AppContent = () => {
 
       {/* Toast Notification */}
       {toast.visible && (
-        <div className="fixed top-4 right-4 z-[100] animate-in slide-in-from-right-10 fade-in duration-300">
+        <div className="fixed top-4 right-4 z-[100] animate-in slide-in-from-right-10 fade-in duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]">
           <div className="bg-zinc-900 border border-emerald-500/20 text-emerald-500 px-4 py-3 rounded-lg shadow-2xl shadow-emerald-500/10 flex items-center gap-2 backdrop-blur-md">
             <CheckCircle2 size={18} />
             <span className="font-medium text-sm">{toast.message}</span>
@@ -450,10 +461,10 @@ const AppContent = () => {
         <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
           
           {/* Page Header */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 animate-in fade-in slide-in-from-top-4 duration-700">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 animate-in fade-in slide-in-from-top-4 duration-700 delay-100">
              <div>
-               <h2 className="text-2xl font-bold text-white capitalize">{profile?.language === 'id' && activeView === 'overview' ? 'Ringkasan' : activeView}</h2>
-               <p className="text-zinc-400">
+               <h2 className="text-3xl font-bold text-white capitalize tracking-tight">{profile?.language === 'id' && activeView === 'overview' ? 'Ringkasan' : activeView}</h2>
+               <p className="text-zinc-400 mt-1">
                  {activeView === 'overview' && t?.welcome}
                  {activeView === 'transactions' && t?.manageTx}
                  {activeView === 'budgeting' && t?.trackBudget}
@@ -467,14 +478,14 @@ const AppContent = () => {
                   <DateRangePicker id="tour-filter" date={dateRange} setDate={setDateRange} />
                 )}
 
-                <button className="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 relative transition-colors hover:text-white">
-                   <Bell size={20} />
+                <button className="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 relative transition-all hover:scale-105 hover:text-white group">
+                   <Bell size={20} className="group-hover:animate-pulse" />
                    <span className="absolute top-1.5 right-2 w-2 h-2 bg-orange-500 rounded-full border border-zinc-950"></span>
                 </button>
              </div>
           </div>
 
-          <div key={activeView} className="animate-in fade-in slide-in-from-bottom-8 duration-500 ease-in-out">
+          <div className="min-h-[500px]">
             {renderContent()}
           </div>
 
@@ -494,12 +505,11 @@ const App = () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
-            console.warn("Supabase auth error (likely missing keys):", error.message);
-            // If keys are missing, we stop loading but don't have a session, so it shows AuthPage
+           console.error("Supabase Error:", error.message);
         }
         setSession(session);
       } catch (err) {
-        console.error("Session init failed:", err);
+        console.error("Critical Session Error:", err);
       } finally {
         setLoading(false);
       }

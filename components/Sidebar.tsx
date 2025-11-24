@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { LayoutDashboard, Receipt, Settings, CreditCard, LogOut } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 import { Language } from '../types';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../lib/supabase'; // UPDATED IMPORT
 import { financeService } from '../services/financeService';
 
 type View = 'overview' | 'transactions' | 'budgeting' | 'settings';
