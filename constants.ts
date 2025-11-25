@@ -47,6 +47,46 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
   { id: '14', amount: 1200, description: 'Monthly Rent', category: 'Housing', type: 'expense', date: '2023-08-02', created_at: new Date().toISOString() },
 ];
 
+// Helper to generate random demo data for current month
+export const generateDemoData = (): Transaction[] => {
+  const transactions: Transaction[] = [];
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  
+  // Generate 50 items
+  for (let i = 0; i < 50; i++) {
+    const day = Math.floor(Math.random() * 28) + 1; // 1-28
+    const date = new Date(year, month, day);
+    const dateStr = date.toISOString().split('T')[0];
+    
+    const isExpense = Math.random() > 0.3; // 70% expenses
+    const category = DEFAULT_CATEGORIES[Math.floor(Math.random() * DEFAULT_CATEGORIES.length)];
+    const amountBase = isExpense ? Math.floor(Math.random() * 500) + 10 : Math.floor(Math.random() * 5000) + 2000;
+    
+    // Scale amount roughly for IDR (assuming default inputs usually imply currency scale)
+    // If using USD, numbers might look huge, but financeService handles currency switch later.
+    // Let's generate base values and let the user switch currency to scale them.
+    // Actually, let's assume raw numbers. If IDR, we want millions. If USD, hundreds.
+    // For demo simplicity, we'll generate "USD-like" numbers, and if user is IDR, convertDataCurrency will fix it on switch.
+    // OR we generate big numbers if we assume IDR default.
+    // Let's generate generically.
+    const amount = amountBase * (isExpense ? 1 : 1); 
+
+    transactions.push({
+      id: `demo-${i}-${Math.random().toString(36).substring(7)}`,
+      amount: amount,
+      description: isExpense ? `Demo Expense: ${category}` : `Demo Income: ${category}`,
+      category: category,
+      type: isExpense ? 'expense' : 'income',
+      date: dateStr,
+      created_at: new Date().toISOString()
+    });
+  }
+  
+  return transactions;
+};
+
 export const TRANSLATIONS = {
   en: {
     overview: "Overview",

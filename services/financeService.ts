@@ -1,5 +1,5 @@
 import { Transaction, UserProfile, BudgetLimits, CurrencyCode } from '../types';
-import { INITIAL_TRANSACTIONS, DEFAULT_CATEGORIES, EXCHANGE_RATES } from '../constants';
+import { INITIAL_TRANSACTIONS, DEFAULT_CATEGORIES, EXCHANGE_RATES, generateDemoData } from '../constants';
 
 const TX_STORAGE_KEY = 'ghifarmkcy_transactions';
 const SETTINGS_STORAGE_KEY = 'ghifarmkcy_settings';
@@ -121,5 +121,28 @@ export const financeService = {
     // Optionally keep transactions or clear them:
     // localStorage.removeItem(TX_STORAGE_KEY);
     // localStorage.removeItem(BUDGET_STORAGE_KEY);
+  },
+
+  injectDemoData: async () => {
+    // 1. Transactions
+    const demoTxs = generateDemoData();
+    localStorage.setItem(TX_STORAGE_KEY, JSON.stringify(demoTxs));
+
+    // 2. Budgets
+    const demoBudgets: BudgetLimits = {};
+    DEFAULT_CATEGORIES.forEach(cat => {
+        demoBudgets[cat] = 2000000; // 2 million IDR estimate
+    });
+    localStorage.setItem(BUDGET_STORAGE_KEY, JSON.stringify(demoBudgets));
+
+    // 3. Settings/Profile
+    const settings = JSON.parse(localStorage.getItem(SETTINGS_STORAGE_KEY) || JSON.stringify(DEFAULT_SETTINGS)) as UserProfile;
+    settings.name = "Demo User";
+    settings.initialBalance = 10000000; // 10 million IDR
+    settings.onboardingCompleted = true;
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+    
+    // Refresh to apply
+    window.location.reload();
   }
 };

@@ -1,6 +1,5 @@
-
 import React, { useEffect, useState, useMemo } from 'react';
-import { Menu, Bell, Loader2, CheckCircle2, User, Settings, BellRing, Database, ChevronRight, LogOut, Shield } from 'lucide-react';
+import { Menu, Bell, Loader2, CheckCircle2, User, Settings, BellRing, Database, ChevronRight, LogOut, Shield, Play } from 'lucide-react';
 import { DashboardStats } from './components/DashboardStats';
 import { Analytics } from './components/Analytics';
 import { TransactionList } from './components/TransactionList';
@@ -17,7 +16,7 @@ import { Transaction, DashboardStats as StatsType, UserProfile, CurrencyCode, Bu
 import { TRANSLATIONS } from './constants';
 import { Card, CardContent, CardHeader, CardTitle, Button, Input, Switch, Badge, Separator, Dialog } from './components/ui/DesignSystem';
 import { UserProvider, useUser } from './contexts/UserContext';
-import { supabase } from './lib/supabase'; // UPDATED IMPORT
+import { supabase } from './lib/supabase'; // Correct import to lib/supabase.ts
 import { Session } from '@supabase/supabase-js';
 
 type View = 'overview' | 'transactions' | 'budgeting' | 'settings';
@@ -127,6 +126,12 @@ const AppContent = () => {
   const openBalanceModal = () => {
       setTempBalance(profile?.initialBalance?.toString() || '');
       setIsBalanceModalOpen(true);
+  };
+
+  const handleInjectDemoData = async () => {
+     if(confirm("This will overwrite your current data with demo data. Continue?")) {
+         await financeService.injectDemoData();
+     }
   };
 
   // --- Helpers & Filtering ---
@@ -356,14 +361,27 @@ const AppContent = () => {
                               <p className="text-sm text-zinc-400 mb-4">
                                  Actions here are irreversible. Be careful.
                               </p>
-                              <div className="flex items-center justify-between bg-black/20 p-4 rounded-xl border border-red-500/10">
-                                 <div>
-                                    <div className="text-sm font-medium text-white">Delete All Data</div>
-                                    <div className="text-xs text-zinc-500">Clear transactions and reset budgets.</div>
-                                 </div>
-                                 <Button variant="danger" size="sm" type="button" onClick={() => alert("Please contact support to perform a full reset.")}>
-                                    Reset Data
-                                 </Button>
+                              
+                              <div className="space-y-4">
+                                  <div className="flex items-center justify-between bg-black/20 p-4 rounded-xl border border-blue-500/10">
+                                     <div>
+                                        <div className="text-sm font-medium text-blue-400">Inject Demo Data</div>
+                                        <div className="text-xs text-zinc-500">Populate the app with realistic sample data for testing.</div>
+                                     </div>
+                                     <Button variant="secondary" size="sm" type="button" onClick={handleInjectDemoData}>
+                                        <Play size={14} className="mr-2" /> Inject Data
+                                     </Button>
+                                  </div>
+
+                                  <div className="flex items-center justify-between bg-black/20 p-4 rounded-xl border border-red-500/10">
+                                     <div>
+                                        <div className="text-sm font-medium text-white">Delete All Data</div>
+                                        <div className="text-xs text-zinc-500">Clear transactions and reset budgets.</div>
+                                     </div>
+                                     <Button variant="danger" size="sm" type="button" onClick={() => alert("Please contact support to perform a full reset.")}>
+                                        Reset Data
+                                     </Button>
+                                  </div>
                               </div>
                            </div>
                         </div>
