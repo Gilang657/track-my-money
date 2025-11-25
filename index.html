@@ -9,9 +9,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css"/>
     <style>
+      html {
+        scroll-behavior: smooth;
+      }
       body {
         font-family: 'Inter', sans-serif;
         background-color: #09090b;
@@ -43,6 +46,22 @@
         -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
       }
 
+      /* Noise Texture */
+      .bg-noise {
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+      }
+
+      /* 3D Transforms */
+      .perspective-1000 {
+        perspective: 1000px;
+      }
+      .rotate-x-12 {
+        transform: rotateX(20deg);
+      }
+      .rotate-x-0 {
+        transform: rotateX(0deg);
+      }
+
       /* Driver.js Customization */
       .driver-popover.driverjs-theme {
         background-color: #18181b;
@@ -72,23 +91,45 @@
         background-color: #ea580c;
       }
 
-      /* Utilities for smooth cascading animations */
-      .delay-50 { animation-delay: 50ms; }
-      .delay-100 { animation-delay: 100ms; }
-      .delay-150 { animation-delay: 150ms; }
-      .delay-200 { animation-delay: 200ms; }
-      .delay-300 { animation-delay: 300ms; }
-      
-      @keyframes float {
-        0% { transform: translateY(0px); }
-        50% { transform: translateY(-10px); }
-        100% { transform: translateY(0px); }
+      /* Reveal Animation on Scroll */
+      .reveal {
+        opacity: 0;
+        transform: translateY(50px);
+        transition: all 1.2s cubic-bezier(0.25, 0.1, 0.25, 1);
       }
-      .animate-float {
-        animation: float 6s ease-in-out infinite;
+      .reveal.active {
+        opacity: 1;
+        transform: translateY(0);
       }
 
-      /* Shimmer Effect for Pro Badge */
+      /* Floating Animation */
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+      }
+      .animate-float-slow { animation: float 6s ease-in-out infinite; }
+      .animate-float-medium { animation: float 4s ease-in-out infinite; }
+      .animate-float-fast { animation: float 3s ease-in-out infinite; }
+
+      /* Marquee Animation */
+      @keyframes marquee {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
+      .animate-marquee {
+        animation: marquee 30s linear infinite;
+      }
+
+      /* Pulse Glow for CTA */
+      @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); }
+        50% { box-shadow: 0 0 40px rgba(249, 115, 22, 0.8); }
+      }
+      .animate-pulse-glow {
+        animation: pulse-glow 2s infinite;
+      }
+
+      /* Shimmer Effect */
       @keyframes shimmer {
         0% { background-position: 200% 0; }
         100% { background-position: -200% 0; }
@@ -100,15 +141,15 @@
   <script type="importmap">
 {
   "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
     "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
-    "recharts": "https://aistudiocdn.com/recharts@^3.5.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
     "@supabase/supabase-js": "https://aistudiocdn.com/@supabase/supabase-js@^2.84.0",
-    "driver.js": "https://aistudiocdn.com/driver.js@^1.4.0",
     "vite": "https://aistudiocdn.com/vite@^7.2.4",
-    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1"
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1",
+    "recharts": "https://aistudiocdn.com/recharts@^3.5.0",
+    "driver.js": "https://aistudiocdn.com/driver.js@^1.4.0"
   }
 }
 </script>

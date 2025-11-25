@@ -11,6 +11,7 @@ import { DateRangePicker } from './components/ui/DateRangePicker';
 import { OnboardingWizard } from './components/OnboardingWizard'; 
 import { AppTour } from './components/AppTour'; 
 import { AuthPage } from './components/AuthPage';
+import { LandingPage } from './components/LandingPage';
 import { financeService } from './services/financeService';
 import { Transaction, DashboardStats as StatsType, UserProfile, CurrencyCode, BudgetLimits, DateRange } from './types';
 import { TRANSLATIONS } from './constants';
@@ -588,6 +589,7 @@ const AppContent = () => {
 const App = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showAuth, setShowAuth] = useState(false);
 
   useEffect(() => {
     const initSession = async () => {
@@ -624,9 +626,12 @@ const App = () => {
     );
   }
 
-  // Gatekeeper: If no session, show Auth Page
+  // Gatekeeper: If no session, show Landing Page or Auth Page
   if (!session) {
-    return <AuthPage />;
+    if (showAuth) {
+        return <AuthPage />;
+    }
+    return <LandingPage onStart={() => setShowAuth(true)} />;
   }
 
   return (
