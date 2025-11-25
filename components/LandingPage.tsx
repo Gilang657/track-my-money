@@ -1,42 +1,68 @@
+import React, { useState, useEffect } from 'react';
+import { Code, Database, Layout, Smartphone, Github, Instagram, Linkedin, Globe, Wallet, PieChart, Coins, CreditCard, ExternalLink } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Code, Database, Layout, Smartphone, Github, Instagram, Linkedin, Globe, Wallet, PieChart, Coins, CreditCard, ExternalLink, Mail } from 'lucide-react';
+// --- Reusable Component for Framer Motion Reveal ---
+const RevealOnScroll = ({ children, className = "", delay = 0 }: { children: React.ReactNode, className?: string, delay?: number }) => {
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8, delay: delay, ease: "easeOut" }}
+            className={className}
+        >
+            {children}
+        </motion.div>
+    );
+};
 
-// --- Reusable Component for Scroll Reveal Animation ---
-const RevealOnScroll = ({ children, className = "" }: { children: React.ReactNode, className?: string }) => {
-    const ref = useRef<HTMLDivElement>(null);
+// --- GTA VI Style Directional Scroll Reveal ---
+interface ScrollSlideInProps {
+    direction: 'left' | 'right' | 'up';
+    children: React.ReactNode;
+    className?: string;
+    delay?: number;
+}
 
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    ref.current?.classList.add('active');
-                    observer.unobserve(entry.target); // Trigger once
-                }
-            },
-            { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
-        );
+const ScrollSlideIn = ({ direction, children, className = "", delay = 0 }: ScrollSlideInProps) => {
+    const variants = {
+        hidden: {
+            x: direction === 'left' ? -150 : direction === 'right' ? 150 : 0,
+            y: direction === 'up' ? 100 : 0,
+            opacity: 0
+        },
+        visible: {
+            x: 0,
+            y: 0,
+            opacity: 1,
+            transition: {
+                type: "spring" as const,
+                damping: 20,
+                stiffness: 100,
+                delay: delay
+            }
+        }
+    };
 
-        if (ref.current) observer.observe(ref.current);
-
-        return () => {
-            if (ref.current) observer.disconnect();
-        };
-    }, []);
-
-    return <div ref={ref} className={`reveal ${className}`}>{children}</div>;
+    return (
+        <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={variants}
+            className={className}
+        >
+            {children}
+        </motion.div>
+    );
 };
 
 export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [lang, setLang] = useState<'id' | 'en'>('id'); // Default ID
-  const [offset, setOffset] = useState(0);
-
-  // Parallax Effect Logic
-  useEffect(() => {
-      const handleScroll = () => setOffset(window.scrollY);
-      window.addEventListener('scroll', handleScroll);
-      return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const { scrollY } = useScroll();
+  const y1 = useTransform(scrollY, [0, 500], [0, 200]);
+  const y2 = useTransform(scrollY, [0, 500], [0, -150]);
 
   const CONTENT = {
     id: {
@@ -44,7 +70,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
       hero: {
         titlePrefix: "Kendalikan",
         titleSuffix: "Uang Anda.",
-        desc: "Bukan sekadar pencatat pengeluaran. Ini adalah pusat kendali keuangan pribadi Anda. Analisis real-time, tanpa spreadsheet yang membosankan.",
+        desc: "Kelola dan optimalkan keuangan pribadi Anda melalui sistem analisis yang terstruktur, akurat, dan mudah digunakan",
         ctaMain: "Coba Gratis Sekarang",
         ctaSec: "Lihat Kode"
       },
@@ -149,7 +175,12 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
     <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-orange-500/30 overflow-x-hidden">
       
       {/* Navbar */}
-      <nav className="fixed top-0 w-full z-50 px-6 py-4 flex justify-between items-center bg-black/70 backdrop-blur-lg border-b border-white/5 transition-all duration-300">
+      <motion.nav 
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="fixed top-0 w-full z-50 px-6 py-4 flex justify-between items-center bg-black/70 backdrop-blur-lg border-b border-white/5"
+      >
         <div className="text-xl font-bold tracking-tighter flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></div>
           ghifar<span className="text-zinc-500">mkcy</span>.
@@ -171,46 +202,52 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
                 {t.nav.start}
              </button>
         </div>
-      </nav>
+      </motion.nav>
 
       {/* --- HERO SECTION --- */}
       <section className="relative pt-32 pb-20 px-6 min-h-screen flex flex-col items-center justify-center overflow-hidden">
          
-         {/* Background Aurora */}
+         {/* Background Aurora with Parallax via Framer Motion */}
+         <motion.div 
+            style={{ y: y1 }}
+            className="absolute top-[-20%] left-[20%] w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"
+         ></motion.div>
+         <motion.div 
+            style={{ y: y2 }}
+            className="absolute top-[10%] right-[10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[100px] pointer-events-none"
+         ></motion.div>
          <div 
-            className="absolute top-[-20%] left-[20%] w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none transition-transform duration-75 ease-out"
-            style={{ transform: `translateY(${offset * 0.2}px)` }}
-         ></div>
-         <div 
-            className="absolute top-[10%] right-[10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[100px] pointer-events-none transition-transform duration-75 ease-out"
-            style={{ transform: `translateY(${offset * 0.1}px)` }}
-         ></div>
-         <div 
-            className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-orange-500/10 rounded-full blur-[100px] pointer-events-none transition-transform duration-75 ease-out"
-            style={{ transform: `translateY(${offset * 0.15}px)` }}
+            className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-orange-500/10 rounded-full blur-[100px] pointer-events-none"
          ></div>
 
-         <RevealOnScroll className="relative z-10 text-center max-w-4xl mx-auto space-y-8">
-            <h1 className="text-6xl md:text-8xl font-serif tracking-tight text-white leading-[1.1] drop-shadow-2xl">
-               {t.hero.titlePrefix} <br/> 
-               <span className="italic font-light text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-200">{t.hero.titleSuffix}</span>
-            </h1>
-            <p className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto font-light leading-relaxed">
-               {t.hero.desc}
-            </p>
+         <div className="relative z-20 text-center max-w-4xl mx-auto space-y-8">
+            <RevealOnScroll delay={0.1}>
+                <h1 className="text-5xl sm:text-6xl md:text-8xl font-serif tracking-tight text-white leading-[1.1] drop-shadow-2xl">
+                {t.hero.titlePrefix} <br/> 
+                <span className="italic font-light text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-200">{t.hero.titleSuffix}</span>
+                </h1>
+            </RevealOnScroll>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
-               <button onClick={onStart} className="w-full sm:w-auto px-8 py-4 bg-orange-500 text-white rounded-full font-bold text-lg hover:bg-orange-600 transition-all animate-pulse-glow hover:scale-105 active:scale-95">
-                  {t.hero.ctaMain}
-               </button>
-               <button onClick={onStart} className="w-full sm:w-auto px-8 py-4 border border-zinc-700 rounded-full font-medium text-zinc-300 hover:text-white hover:border-zinc-500 hover:bg-white/5 transition-all">
-                  {t.hero.ctaSec}
-               </button>
-            </div>
-         </RevealOnScroll>
+            <RevealOnScroll delay={0.3}>
+                <p className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto font-light leading-relaxed">
+                {t.hero.desc}
+                </p>
+            </RevealOnScroll>
+            
+            <RevealOnScroll delay={0.5}>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
+                <button onClick={onStart} className="w-full sm:w-auto px-8 py-4 bg-orange-500 text-white rounded-full font-bold text-lg hover:bg-orange-600 transition-all animate-pulse-glow hover:scale-105 active:scale-95">
+                    {t.hero.ctaMain}
+                </button>
+                <button onClick={onStart} className="w-full sm:w-auto px-8 py-4 border border-zinc-700 rounded-full font-medium text-zinc-300 hover:text-white hover:border-zinc-500 hover:bg-white/5 transition-all">
+                    {t.hero.ctaSec}
+                </button>
+                </div>
+            </RevealOnScroll>
+         </div>
 
-         {/* Floating Elements (3D Depth) */}
-         <div className="absolute inset-0 pointer-events-none overflow-hidden max-w-7xl mx-auto">
+         {/* Floating Elements (3D Depth) - HIDDEN ON MOBILE to prevent text overlap */}
+         <div className="absolute inset-0 pointer-events-none overflow-hidden max-w-7xl mx-auto hidden md:block z-0">
              <FloatingElement className="top-[20%] left-[5%] animate-float-slow delay-0">
                  <div className="p-4 bg-zinc-900/80 backdrop-blur border border-white/10 rounded-2xl shadow-2xl transform -rotate-12">
                      <Wallet className="w-8 h-8 text-orange-500" />
@@ -234,70 +271,74 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
          </div>
 
          {/* Dashboard Mockup (3D Tilt) */}
-         <div className="relative mt-24 w-full max-w-5xl perspective-1000 group">
-            <RevealOnScroll>
-                <div className="relative rounded-xl border border-white/10 bg-[#09090b] shadow-2xl shadow-orange-900/20 transform rotate-x-12 scale-[0.9] group-hover:rotate-x-0 group-hover:scale-100 transition-all duration-1000 ease-[cubic-bezier(0.25,0.1,0.25,1)] p-2">
-                    {/* CSS Drawn Dashboard - Miniaturized for visual impact */}
-                    <div className="flex h-[400px] md:h-[600px] rounded-lg overflow-hidden bg-black/50">
-                        {/* Mock Sidebar */}
-                        <div className="hidden md:flex w-16 lg:w-48 border-r border-white/5 flex-col p-4 gap-4 bg-zinc-950/50">
-                            <div className="flex items-center gap-2 mb-4">
-                                <div className="w-4 h-4 rounded-full bg-orange-500 shrink-0"></div>
-                                <div className="h-2 w-20 bg-zinc-800 rounded hidden lg:block"></div>
-                            </div>
-                            {[1, 2, 3, 4].map(i => (
-                                <div key={i} className={`h-8 rounded-lg w-full flex items-center px-2 gap-3 ${i === 1 ? 'bg-zinc-800/80 border border-white/5' : 'opacity-50'}`}>
-                                    <div className={`w-4 h-4 rounded ${i === 1 ? 'bg-orange-500/50' : 'bg-zinc-800'}`}></div>
-                                </div>
-                            ))}
+         <motion.div 
+            initial={{ opacity: 0, scale: 0.8, rotateX: 40 }}
+            whileInView={{ opacity: 1, scale: 0.9, rotateX: 20 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            className="relative mt-24 w-full max-w-5xl perspective-1000 group hover:scale-100 hover:rotate-x-0 transition-transform duration-1000 z-10"
+         >
+            <div className="relative rounded-xl border border-white/10 bg-[#09090b] shadow-2xl shadow-orange-900/20 p-2">
+                {/* CSS Drawn Dashboard - Miniaturized for visual impact */}
+                <div className="flex h-[400px] md:h-[600px] rounded-lg overflow-hidden bg-black/50">
+                    {/* Mock Sidebar */}
+                    <div className="hidden md:flex w-16 lg:w-48 border-r border-white/5 flex-col p-4 gap-4 bg-zinc-950/50">
+                        <div className="flex items-center gap-2 mb-4">
+                            <div className="w-4 h-4 rounded-full bg-orange-500 shrink-0"></div>
+                            <div className="h-2 w-20 bg-zinc-800 rounded hidden lg:block"></div>
                         </div>
-                        {/* Mock Main Content */}
-                        <div className="flex-1 flex flex-col p-4 md:p-6 gap-6 overflow-hidden relative">
-                            {/* Header */}
-                            <div className="flex justify-between items-center mb-2">
-                                <div>
-                                    <div className="h-3 w-32 bg-zinc-800 rounded mb-2"></div>
-                                </div>
-                                <div className="flex gap-2">
-                                    <div className="h-8 w-8 rounded-full bg-zinc-800"></div>
-                                </div>
+                        {[1, 2, 3, 4].map(i => (
+                            <div key={i} className={`h-8 rounded-lg w-full flex items-center px-2 gap-3 ${i === 1 ? 'bg-zinc-800/80 border border-white/5' : 'opacity-50'}`}>
+                                <div className={`w-4 h-4 rounded ${i === 1 ? 'bg-orange-500/50' : 'bg-zinc-800'}`}></div>
                             </div>
-                            {/* Stats */}
-                            <div className="grid grid-cols-3 gap-4">
-                                <div className="p-4 rounded-xl bg-zinc-900/50 border border-white/5 relative overflow-hidden">
-                                    <div className="absolute top-0 left-0 w-1 h-full bg-orange-500"></div>
-                                    <div className="h-4 w-12 bg-zinc-800 rounded mb-2"></div>
-                                    <div className="text-lg font-bold text-white">Rp 15.250.000</div>
-                                </div>
-                                <div className="p-4 rounded-xl bg-zinc-900/50 border border-white/5">
-                                    <div className="h-4 w-12 bg-zinc-800 rounded mb-2"></div>
-                                    <div className="text-lg font-bold text-emerald-500">+Rp 8.5M</div>
-                                </div>
-                                <div className="p-4 rounded-xl bg-zinc-900/50 border border-white/5">
-                                    <div className="h-4 w-12 bg-zinc-800 rounded mb-2"></div>
-                                    <div className="text-lg font-bold text-rose-500">-Rp 3.2M</div>
-                                </div>
+                        ))}
+                    </div>
+                    {/* Mock Main Content */}
+                    <div className="flex-1 flex flex-col p-4 md:p-6 gap-6 overflow-hidden relative">
+                        {/* Header */}
+                        <div className="flex justify-between items-center mb-2">
+                            <div>
+                                <div className="h-3 w-32 bg-zinc-800 rounded mb-2"></div>
                             </div>
-                             {/* Chart Area */}
-                            <div className="flex-1 bg-zinc-900/30 border border-white/5 rounded-xl p-4 relative overflow-hidden">
-                                <div className="absolute inset-x-0 bottom-0 top-10 opacity-40">
-                                    <svg viewBox="0 0 100 40" preserveAspectRatio="none" className="w-full h-full">
-                                        <path d="M0,40 L0,30 C10,25 20,35 30,20 C40,5 50,25 60,15 C70,5 80,10 90,5 L100,0 L100,40 Z" fill="url(#grad)" />
-                                        <defs>
-                                            <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
-                                                <stop offset="0%" stopColor="#f97316" stopOpacity="0.5" />
-                                                <stop offset="100%" stopColor="#f97316" stopOpacity="0" />
-                                            </linearGradient>
-                                        </defs>
-                                        <path d="M0,30 C10,25 20,35 30,20 C40,5 50,25 60,15 C70,5 80,10 90,5 L100,0" stroke="#f97316" strokeWidth="0.5" fill="none" />
-                                    </svg>
-                                </div>
+                            <div className="flex gap-2">
+                                <div className="h-8 w-8 rounded-full bg-zinc-800"></div>
+                            </div>
+                        </div>
+                        {/* Stats */}
+                        <div className="grid grid-cols-3 gap-4">
+                            <div className="p-4 rounded-xl bg-zinc-900/50 border border-white/5 relative overflow-hidden">
+                                <div className="absolute top-0 left-0 w-1 h-full bg-orange-500"></div>
+                                <div className="h-4 w-12 bg-zinc-800 rounded mb-2"></div>
+                                <div className="text-lg font-bold text-white">Rp 15.250.000</div>
+                            </div>
+                            <div className="p-4 rounded-xl bg-zinc-900/50 border border-white/5">
+                                <div className="h-4 w-12 bg-zinc-800 rounded mb-2"></div>
+                                <div className="text-lg font-bold text-emerald-500">+Rp 8.5M</div>
+                            </div>
+                            <div className="p-4 rounded-xl bg-zinc-900/50 border border-white/5">
+                                <div className="h-4 w-12 bg-zinc-800 rounded mb-2"></div>
+                                <div className="text-lg font-bold text-rose-500">-Rp 3.2M</div>
+                            </div>
+                        </div>
+                            {/* Chart Area */}
+                        <div className="flex-1 bg-zinc-900/30 border border-white/5 rounded-xl p-4 relative overflow-hidden">
+                            <div className="absolute inset-x-0 bottom-0 top-10 opacity-40">
+                                <svg viewBox="0 0 100 40" preserveAspectRatio="none" className="w-full h-full">
+                                    <path d="M0,40 L0,30 C10,25 20,35 30,20 C40,5 50,25 60,15 C70,5 80,10 90,5 L100,0 L100,40 Z" fill="url(#grad)" />
+                                    <defs>
+                                        <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                            <stop offset="0%" stopColor="#f97316" stopOpacity="0.5" />
+                                            <stop offset="100%" stopColor="#f97316" stopOpacity="0" />
+                                        </linearGradient>
+                                    </defs>
+                                    <path d="M0,30 C10,25 20,35 30,20 C40,5 50,25 60,15 C70,5 80,10 90,5 L100,0" stroke="#f97316" strokeWidth="0.5" fill="none" />
+                                </svg>
                             </div>
                         </div>
                     </div>
                 </div>
-            </RevealOnScroll>
-         </div>
+            </div>
+         </motion.div>
       </section>
 
       {/* --- INFINITE MARQUEE --- */}
@@ -325,45 +366,45 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
                  
-                 {/* 1. Analytics (Large) */}
-                 <RevealOnScroll className="md:col-span-2 row-span-1">
+                 {/* 1. Analytics (Large) - Enter Left */}
+                 <ScrollSlideIn direction="left" className="md:col-span-2 row-span-1" delay={0.1}>
                     <BentoCard 
                         title={t.features.bento.analytics}
                         desc={t.features.bento.analyticsDesc}
-                        imgSrc="/feature-analytics.png"
+                        imgSrc="/photo/1.png"
                         className="h-full"
                     />
-                 </RevealOnScroll>
+                 </ScrollSlideIn>
 
-                 {/* 2. Security (Small) */}
-                 <RevealOnScroll className="md:col-span-1">
+                 {/* 2. Security (Small) - Enter Up */}
+                 <ScrollSlideIn direction="up" className="md:col-span-1" delay={0.2}>
                      <BentoCard 
                         title={t.features.bento.secure}
                         desc={t.features.bento.secureDesc}
-                        imgSrc="/feature-security.png"
+                        imgSrc="/photo/4.png"
                         className="h-full"
                     />
-                 </RevealOnScroll>
+                 </ScrollSlideIn>
 
-                 {/* 3. Speed/Mobile (Small) */}
-                 <RevealOnScroll className="md:col-span-1">
+                 {/* 3. Speed/Mobile (Small) - Enter Up */}
+                 <ScrollSlideIn direction="up" className="md:col-span-1" delay={0.3}>
                      <BentoCard 
                         title={t.features.bento.speed}
                         desc={t.features.bento.speedDesc}
-                        imgSrc="/feature-speed.png"
+                        imgSrc="/photo/3.png"
                         className="h-full"
                     />
-                 </RevealOnScroll>
+                 </ScrollSlideIn>
 
-                 {/* 4. Budget (Large) */}
-                 <RevealOnScroll className="md:col-span-2">
+                 {/* 4. Budget (Large) - Enter Right */}
+                 <ScrollSlideIn direction="right" className="md:col-span-2" delay={0.4}>
                      <BentoCard 
                         title={t.features.bento.budget}
                         desc={t.features.bento.budgetDesc}
-                        imgSrc="/feature-budget.png"
+                        imgSrc="/photo/2.png"
                         className="h-full"
                     />
-                 </RevealOnScroll>
+                 </ScrollSlideIn>
              </div>
           </div>
       </section>
@@ -373,13 +414,13 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
           {/* Subtle Grid Bg */}
           <div className="absolute inset-0 bg-grid-pattern opacity-30 pointer-events-none"></div>
 
-          {/* Stroke Parallax Text (Subtler) */}
-          <div 
-             className="absolute top-10 left-10 text-[10vw] font-black text-transparent leading-none select-none pointer-events-none transition-transform duration-100 ease-linear opacity-20"
-             style={{ WebkitTextStroke: '1px #3f3f46', transform: `translateX(${offset * 0.1}px)` }}
+          {/* Stroke Parallax Text via Framer Motion */}
+          <motion.div 
+             style={{ x: y2, WebkitTextStroke: '1px #3f3f46' }}
+             className="absolute top-10 left-10 text-[10vw] font-black text-transparent leading-none select-none pointer-events-none opacity-20"
           >
               DEVELOPER
-          </div>
+          </motion.div>
 
           <div className="relative z-10 max-w-5xl mx-auto">
               <RevealOnScroll>
@@ -389,7 +430,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
                   </div>
               </RevealOnScroll>
 
-              <RevealOnScroll className="delay-200">
+              <RevealOnScroll delay={0.2}>
                   <div className="bg-zinc-900/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-2xl overflow-hidden relative group">
                       
                       {/* Glow FX */}
@@ -457,10 +498,10 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
               </RevealOnScroll>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                  <RevealOnScroll className="delay-0"><TechCard icon={<Code />} title="React + Vite" desc={t.tech.items.react} /></RevealOnScroll>
-                  <RevealOnScroll className="delay-100"><TechCard icon={<Layout />} title="Tailwind CSS" desc={t.tech.items.tw} /></RevealOnScroll>
-                  <RevealOnScroll className="delay-200"><TechCard icon={<Database />} title="Supabase" desc={t.tech.items.sb} /></RevealOnScroll>
-                  <RevealOnScroll className="delay-300"><TechCard icon={<Smartphone />} title="Responsive" desc={t.tech.items.resp} /></RevealOnScroll>
+                  <RevealOnScroll delay={0}><TechCard icon={<Code />} title="React + Vite" desc={t.tech.items.react} /></RevealOnScroll>
+                  <RevealOnScroll delay={0.1}><TechCard icon={<Layout />} title="Tailwind CSS" desc={t.tech.items.tw} /></RevealOnScroll>
+                  <RevealOnScroll delay={0.2}><TechCard icon={<Database />} title="Supabase" desc={t.tech.items.sb} /></RevealOnScroll>
+                  <RevealOnScroll delay={0.3}><TechCard icon={<Smartphone />} title="Responsive" desc={t.tech.items.resp} /></RevealOnScroll>
               </div>
           </div>
       </section>
@@ -525,7 +566,7 @@ const BentoCard = ({ title, desc, imgSrc, className = "" }: { title: string, des
         <div className="relative z-10 p-8 h-full flex flex-col justify-end pointer-events-none bg-gradient-to-t from-black/90 via-black/40 to-transparent">
             <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                 <h3 className="text-2xl font-bold text-white mb-2 drop-shadow-lg">{title}</h3>
-                <p className="text-zinc-300 text-sm max-w-xs drop-shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">{desc}</p>
+             <p className="text-zinc-300 text-sm max-w-xs drop-shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">{desc}</p>
             </div>
         </div>
     </div>
