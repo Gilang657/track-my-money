@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell, LabelList } from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/DesignSystem';
