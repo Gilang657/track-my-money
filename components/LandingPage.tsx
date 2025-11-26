@@ -205,22 +205,30 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
       </motion.nav>
 
       {/* --- HERO SECTION --- */}
-      <section className="relative pt-32 pb-20 px-6 min-h-screen flex flex-col items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
          
-         {/* Background Aurora with Parallax via Framer Motion */}
-         <motion.div 
-            style={{ y: y1 }}
-            className="absolute top-[-20%] left-[20%] w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"
-         ></motion.div>
-         <motion.div 
-            style={{ y: y2 }}
-            className="absolute top-[10%] right-[10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[100px] pointer-events-none"
-         ></motion.div>
-         <div 
-            className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-orange-500/10 rounded-full blur-[100px] pointer-events-none"
-         ></div>
+         {/* Video Background */}
+         <div className="absolute inset-0 w-full h-full z-0">
+             <video 
+                 autoPlay 
+                 loop 
+                 muted 
+                 playsInline 
+                 className="w-full h-full object-cover"
+             >
+                 <source src="/public/video/1.mp4" type="video/mp4" />
+                 {/* Fallback color if video fails */}
+                 <div className="w-full h-full bg-[#050505]"></div>
+             </video>
+             
+             {/* Dark Overlay for Text Readability */}
+             <div className="absolute inset-0 bg-black/60 z-10"></div>
+             
+             {/* Gradient Fade to connect with next section naturally */}
+             <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#050505] to-transparent z-10"></div>
+         </div>
 
-         <div className="relative z-20 text-center max-w-4xl mx-auto space-y-8">
+         <div className="relative z-20 text-center max-w-4xl mx-auto space-y-8 px-6 pt-20">
             <RevealOnScroll delay={0.1}>
                 <h1 className="text-5xl sm:text-6xl md:text-8xl font-serif tracking-tight text-white leading-[1.1] drop-shadow-2xl">
                 {t.hero.titlePrefix} <br/> 
@@ -229,17 +237,17 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
             </RevealOnScroll>
             
             <RevealOnScroll delay={0.3}>
-                <p className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto font-light leading-relaxed">
+                <p className="text-lg md:text-xl text-zinc-300 max-w-2xl mx-auto font-light leading-relaxed drop-shadow-lg">
                 {t.hero.desc}
                 </p>
             </RevealOnScroll>
             
             <RevealOnScroll delay={0.5}>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
-                <button onClick={onStart} className="w-full sm:w-auto px-8 py-4 bg-orange-500 text-white rounded-full font-bold text-lg hover:bg-orange-600 transition-all animate-pulse-glow hover:scale-105 active:scale-95">
+                <button onClick={onStart} className="w-full sm:w-auto px-8 py-4 bg-orange-500 text-white rounded-full font-bold text-lg hover:bg-orange-600 transition-all animate-pulse-glow hover:scale-105 active:scale-95 shadow-lg shadow-orange-900/50">
                     {t.hero.ctaMain}
                 </button>
-                <button onClick={onStart} className="w-full sm:w-auto px-8 py-4 border border-zinc-700 rounded-full font-medium text-zinc-300 hover:text-white hover:border-zinc-500 hover:bg-white/5 transition-all">
+                <button onClick={onStart} className="w-full sm:w-auto px-8 py-4 border border-zinc-500 bg-white/5 backdrop-blur-sm rounded-full font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
                     {t.hero.ctaSec}
                 </button>
                 </div>
@@ -247,24 +255,24 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
          </div>
 
          {/* Floating Elements (3D Depth) - HIDDEN ON MOBILE to prevent text overlap */}
-         <div className="absolute inset-0 pointer-events-none overflow-hidden max-w-7xl mx-auto hidden md:block z-0">
+         <div className="absolute inset-0 pointer-events-none overflow-hidden max-w-7xl mx-auto hidden md:block z-10">
              <FloatingElement className="top-[20%] left-[5%] animate-float-slow delay-0">
-                 <div className="p-4 bg-zinc-900/80 backdrop-blur border border-white/10 rounded-2xl shadow-2xl transform -rotate-12">
+                 <div className="p-4 bg-zinc-900/60 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl transform -rotate-12">
                      <Wallet className="w-8 h-8 text-orange-500" />
                  </div>
              </FloatingElement>
              <FloatingElement className="top-[25%] right-[8%] animate-float-medium delay-1000">
-                 <div className="p-4 bg-zinc-900/80 backdrop-blur border border-white/10 rounded-2xl shadow-2xl transform rotate-6">
+                 <div className="p-4 bg-zinc-900/60 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl transform rotate-6">
                      <PieChart className="w-8 h-8 text-emerald-500" />
                  </div>
              </FloatingElement>
              <FloatingElement className="bottom-[20%] left-[10%] animate-float-fast delay-500">
-                 <div className="p-4 bg-zinc-900/80 backdrop-blur border border-white/10 rounded-2xl shadow-2xl transform rotate-12">
+                 <div className="p-4 bg-zinc-900/60 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl transform rotate-12">
                      <Coins className="w-8 h-8 text-yellow-500" />
                  </div>
              </FloatingElement>
               <FloatingElement className="bottom-[30%] right-[15%] animate-float-slow delay-200">
-                 <div className="p-4 bg-zinc-900/80 backdrop-blur border border-white/10 rounded-2xl shadow-2xl transform -rotate-6">
+                 <div className="p-4 bg-zinc-900/60 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl transform -rotate-6">
                      <CreditCard className="w-8 h-8 text-purple-500" />
                  </div>
              </FloatingElement>
@@ -276,9 +284,9 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
             whileInView={{ opacity: 1, scale: 0.9, rotateX: 20 }}
             viewport={{ once: true }}
             transition={{ duration: 1.5, ease: "easeOut" }}
-            className="relative mt-24 w-full max-w-5xl perspective-1000 group hover:scale-100 hover:rotate-x-0 transition-transform duration-1000 z-10"
+            className="relative mt-24 w-full max-w-5xl perspective-1000 group hover:scale-100 hover:rotate-x-0 transition-transform duration-1000 z-20"
          >
-            <div className="relative rounded-xl border border-white/10 bg-[#09090b] shadow-2xl shadow-orange-900/20 p-2">
+            <div className="relative rounded-xl border border-white/10 bg-[#09090b]/80 backdrop-blur-xl shadow-2xl shadow-orange-900/20 p-2">
                 {/* CSS Drawn Dashboard - Miniaturized for visual impact */}
                 <div className="flex h-[400px] md:h-[600px] rounded-lg overflow-hidden bg-black/50">
                     {/* Mock Sidebar */}
@@ -444,8 +452,10 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
                                   <div className="absolute inset-0 rounded-full border border-orange-500/50 animate-spin-slow"></div>
                                   <div className="w-full h-full rounded-full overflow-hidden border-4 border-zinc-900 bg-zinc-800 relative z-10 group-hover:scale-105 transition-transform duration-500">
                                       <img 
-                                        src="/me.jpg" 
-                                        onError={(e) => e.currentTarget.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=Gilang&backgroundColor=18181b"}
+                                        src="https://github.com/Gilang657.png" 
+                                        onError={(e) => {
+                                            e.currentTarget.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=Gilang&backgroundColor=18181b";
+                                        }}
                                         alt="M. Gilang Alghipari" 
                                         className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500"
                                       />
