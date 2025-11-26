@@ -216,7 +216,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
                  playsInline 
                  className="w-full h-full object-cover"
              >
-                 <source src="/public/video/1.mp4" type="video/mp4" />
+                 <source src="/video/1.mp4" type="video/mp4" />
                  {/* Fallback color if video fails */}
                  <div className="w-full h-full bg-[#050505]"></div>
              </video>
