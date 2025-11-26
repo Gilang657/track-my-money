@@ -1,12 +1,15 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, Button, Input } from './ui/DesignSystem';
-import { supabase } from '../lib/supabase'; // UPDATED IMPORT
+import { supabase } from '../lib/supabase';
 import { TRANSLATIONS } from '../constants';
-import { Loader2, AlertCircle, ArrowRight, Globe } from 'lucide-react';
+import { Loader2, AlertCircle, ArrowRight, Globe, ArrowLeft } from 'lucide-react';
 import { Language } from '../types';
 
-export const AuthPage = () => {
+interface AuthPageProps {
+    onBack: () => void;
+}
+
+export const AuthPage = ({ onBack }: AuthPageProps) => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -46,6 +49,17 @@ export const AuthPage = () => {
   return (
     <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4 relative overflow-hidden font-sans">
       
+      {/* Back Button (Top Left) */}
+      <div className="absolute top-6 left-6 z-50 animate-in fade-in duration-1000">
+         <button 
+            onClick={onBack}
+            className="flex items-center gap-2 text-xs font-bold text-zinc-400 hover:text-white px-4 py-2 rounded-full border border-white/5 hover:bg-white/5 hover:border-white/20 transition-all backdrop-blur-sm"
+         >
+            <ArrowLeft size={14} />
+            {t.back}
+         </button>
+      </div>
+
       {/* Language Toggle (Top Right) */}
       <div className="absolute top-6 right-6 z-50 animate-in fade-in duration-1000">
          <button 

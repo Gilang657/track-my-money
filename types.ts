@@ -1,3 +1,4 @@
+
 export type TransactionType = 'income' | 'expense';
 
 export interface Transaction {
@@ -33,6 +34,7 @@ export interface UserProfile {
   language: Language;
   darkMode: boolean;
   onboardingCompleted: boolean;
+  tourCompleted?: boolean; // New field to track tutorial status
   monthlyBudgetGoal?: number;
   emailAlerts?: boolean;
   monthlyReport?: boolean;

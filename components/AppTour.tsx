@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { driver } from 'driver.js';
 import { Card, CardContent, Button } from './ui/DesignSystem';
@@ -6,27 +7,30 @@ import { TRANSLATIONS } from '../constants';
 import { Compass } from 'lucide-react';
 
 export const AppTour: React.FC = () => {
-  const { profile } = useUser();
+  const { profile, updateProfile } = useUser();
   const [showDialog, setShowDialog] = useState(false);
   
   const t = TRANSLATIONS[profile?.language || 'en'];
-  const STORAGE_KEY = 'ghifarmkcy_tour_seen';
 
   useEffect(() => {
     // Only show if user exists (onboarding done) and hasn't seen tour
-    if (profile && profile.onboardingCompleted) {
-        const hasSeen = localStorage.getItem(STORAGE_KEY);
-        if (!hasSeen) {
-            // Delay slightly to ensure UI is ready
-            const timer = setTimeout(() => setShowDialog(true), 1500);
-            return () => clearTimeout(timer);
-        }
+    if (profile && profile.onboardingCompleted && !profile.tourCompleted) {
+        // Delay slightly to ensure UI is ready
+        const timer = setTimeout(() => setShowDialog(true), 1500);
+        return () => clearTimeout(timer);
     }
   }, [profile]);
 
+  const markAsComplete = async () => {
+      if (!profile) return;
+      setShowDialog(false);
+      // Persist the completion state to the profile
+      await updateProfile({ ...profile, tourCompleted: true });
+  };
+
   const startTour = () => {
-    setShowDialog(false);
-    localStorage.setItem(STORAGE_KEY, 'true');
+    // We mark it as complete immediately so it doesn't pop up again if they refresh mid-tour
+    markAsComplete(); 
 
     const driverObj = driver({
       showProgress: true,
@@ -36,7 +40,7 @@ export const AppTour: React.FC = () => {
             element: '#tour-balance', 
             popover: { 
                 title: t.tourBalanceTitle, 
-                description: t.tourBalanceDesc,
+                description: t.tourBalanceDesc, 
                 side: "bottom", 
                 align: 'start' 
             } 
@@ -45,7 +49,7 @@ export const AppTour: React.FC = () => {
             element: '#tour-quick-add', 
             popover: { 
                 title: t.tourQuickAddTitle, 
-                description: t.tourQuickAddDesc,
+                description: t.tourQuickAddDesc, 
                 side: "left", 
                 align: 'start' 
             } 
@@ -54,7 +58,7 @@ export const AppTour: React.FC = () => {
             element: '#tour-filter', 
             popover: { 
                 title: t.tourFilterTitle, 
-                description: t.tourFilterDesc,
+                description: t.tourFilterDesc, 
                 side: "bottom", 
                 align: 'end' 
             } 
@@ -66,8 +70,7 @@ export const AppTour: React.FC = () => {
   };
 
   const skipTour = () => {
-    localStorage.setItem(STORAGE_KEY, 'true');
-    setShowDialog(false);
+    markAsComplete();
   };
 
   if (!showDialog) return null;

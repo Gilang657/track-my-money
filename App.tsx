@@ -647,7 +647,7 @@ const App = () => {
   // Gatekeeper: If no session, show Landing Page or Auth Page
   if (!session) {
     if (showAuth) {
-        return <AuthPage />;
+        return <AuthPage onBack={() => setShowAuth(false)} />;
     }
     return <LandingPage onStart={() => setShowAuth(true)} />;
   }

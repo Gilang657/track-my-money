@@ -1,19 +1,20 @@
+
 import { Transaction, UserProfile, BudgetLimits, CurrencyCode } from '../types';
 import { INITIAL_TRANSACTIONS, DEFAULT_CATEGORIES, EXCHANGE_RATES, generateDemoData } from '../constants';
 
 const TX_STORAGE_KEY = 'ghifarmkcy_transactions';
 const SETTINGS_STORAGE_KEY = 'ghifarmkcy_settings';
 const BUDGET_STORAGE_KEY = 'ghifarmkcy_budgets';
-const TOUR_STORAGE_KEY = 'ghifarmkcy_tour_seen';
 
-// Modified Default Settings to act as a "New User" for onboarding demo
+// Modified Default Settings
 const DEFAULT_SETTINGS: UserProfile = {
   name: '', 
   email: '',
-  currency: 'IDR', // Default as requested in onboarding prompt
+  currency: 'IDR', 
   language: 'en',
   darkMode: true,
   onboardingCompleted: false,
+  tourCompleted: false, // Default false
   emailAlerts: true,
   monthlyReport: true,
   initialBalance: 0
@@ -116,11 +117,16 @@ export const financeService = {
   },
 
   clearLocalSession: () => {
-    localStorage.removeItem(SETTINGS_STORAGE_KEY);
-    localStorage.removeItem(TOUR_STORAGE_KEY);
-    // Optionally keep transactions or clear them:
+    // IMPORTANT: In this local-only version, we treat LocalStorage as the Database.
+    // We do NOT want to delete the user's data (Settings, Transactions, Budgets) on Logout.
+    // We only want to clear session-specific things if any.
+    
+    // Uncommenting these lines would "Reset" the account, which causes the onboarding to reappear.
+    // localStorage.removeItem(SETTINGS_STORAGE_KEY);
     // localStorage.removeItem(TX_STORAGE_KEY);
     // localStorage.removeItem(BUDGET_STORAGE_KEY);
+    
+    console.log("Session cleared (Data persisted locally)");
   },
 
   injectDemoData: async () => {
@@ -140,6 +146,7 @@ export const financeService = {
     settings.name = "Demo User";
     settings.initialBalance = 10000000; // 10 million IDR
     settings.onboardingCompleted = true;
+    settings.tourCompleted = true; // Mark tour as done for demo
     localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
     
     // Refresh to apply
