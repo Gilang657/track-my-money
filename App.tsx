@@ -1,11 +1,13 @@
+
 import React, { useEffect, useState, useMemo } from 'react';
-import { Menu, Bell, Loader2, CheckCircle2, User, Settings, BellRing, Database, ChevronRight, LogOut, Shield, Play } from 'lucide-react';
+import { Bell, Loader2, CheckCircle2, User, Settings, BellRing, Database, ChevronRight, LogOut, Shield, Play, Menu } from 'lucide-react';
 import { DashboardStats } from './components/DashboardStats';
 import { Analytics } from './components/Analytics';
 import { TransactionList } from './components/TransactionList';
 import { TransactionForm } from './components/TransactionForm';
 import { BudgetView } from './components/BudgetView';
 import { Sidebar } from './components/Sidebar';
+import { MobileNav } from './components/MobileNav'; // Import New Mobile Nav
 import { DateRangePicker } from './components/ui/DateRangePicker'; 
 import { OnboardingWizard } from './components/OnboardingWizard'; 
 import { AppTour } from './components/AppTour'; 
@@ -16,7 +18,7 @@ import { Transaction, DashboardStats as StatsType, UserProfile, CurrencyCode, Bu
 import { TRANSLATIONS } from './constants';
 import { Card, CardContent, CardHeader, CardTitle, Button, Input, Switch, Badge, Separator, Dialog } from './components/ui/DesignSystem';
 import { UserProvider, useUser } from './contexts/UserContext';
-import { supabase } from './lib/supabase'; // Correct import to lib/supabase.ts
+import { supabase } from './lib/supabase';
 import { Session } from '@supabase/supabase-js';
 
 type View = 'overview' | 'transactions' | 'budgeting' | 'settings';
@@ -39,13 +41,16 @@ const AppContent = () => {
   const [dataLoading, setDataLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [settingsLoading, setSettingsLoading] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // Removed old mobileMenuOpen state
   const [activeView, setActiveView] = useState<View>('overview');
   const [toast, setToast] = useState<{message: string, visible: boolean}>({ message: '', visible: false });
 
   // Balance Modal State
   const [isBalanceModalOpen, setIsBalanceModalOpen] = useState(false);
   const [tempBalance, setTempBalance] = useState('');
+
+  // Quick Add Modal State (Mobile FAB)
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // --- Data Fetching ---
   const loadData = async () => {
@@ -85,6 +90,7 @@ const AppContent = () => {
       const added = await financeService.addTransaction(newTx);
       setTransactions(prev => [added, ...prev].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
       showToast("Transaction added successfully");
+      setIsAddModalOpen(false); // Close modal if open
     } finally {
       setActionLoading(false);
     }
@@ -196,7 +202,6 @@ const AppContent = () => {
     const handleToggle = (field: keyof UserProfile, val: boolean) => {
       const newState = { ...formState, [field]: val };
       setFormState(newState);
-      // Auto save trigger for better UX could go here
     };
 
     const renderMenuItem = (id: string, label: string, icon: React.ReactNode) => (
@@ -428,7 +433,8 @@ const AppContent = () => {
                  <div className="xl:col-span-2 order-2 xl:order-1">
                     <TransactionList transactions={filteredTransactions.slice(0, 5)} onDelete={handleDeleteTransaction} formatCurrency={formatCurrency} labels={t} />
                  </div>
-                 <div className="xl:col-span-1 order-1 xl:order-2">
+                 {/* Hide the inline Transaction Form on mobile as we use the Modal there */}
+                 <div className="hidden md:block xl:col-span-1 order-1 xl:order-2">
                     <TransactionForm 
                       onAdd={handleAddTransaction} 
                       loading={actionLoading} 
@@ -446,7 +452,7 @@ const AppContent = () => {
                <div className="xl:col-span-2 order-2 xl:order-1 h-full">
                   <TransactionList transactions={filteredTransactions} onDelete={handleDeleteTransaction} formatCurrency={formatCurrency} labels={t} />
                </div>
-               <div className="xl:col-span-1 order-1 xl:order-2">
+               <div className="hidden md:block xl:col-span-1 order-1 xl:order-2">
                   <TransactionForm 
                       onAdd={handleAddTransaction} 
                       loading={actionLoading} 
@@ -533,6 +539,21 @@ const AppContent = () => {
         </div>
       </Dialog>
 
+      {/* Quick Add Transaction Modal (Mobile) */}
+      <Dialog
+        open={isAddModalOpen}
+        onOpenChange={setIsAddModalOpen}
+        title={t.addTransaction}
+      >
+         <TransactionForm 
+            onAdd={handleAddTransaction} 
+            loading={actionLoading} 
+            labels={t} 
+            categories={activeCategories} 
+            currency={profile!.currency}
+         />
+      </Dialog>
+
       {/* Toast Notification */}
       {toast.visible && (
         <div className="fixed top-4 right-4 z-[100] animate-in slide-in-from-right-10 fade-in duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]">
@@ -543,36 +564,25 @@ const AppContent = () => {
         </div>
       )}
 
-      {/* Desktop Sidebar - Uses Global Context internally */}
+      {/* Desktop Sidebar - Hidden on mobile */}
       <Sidebar activeView={activeView} onNavigate={setActiveView} />
 
-      {/* Mobile Header */}
-      <div className="md:hidden flex items-center justify-between p-4 border-b border-zinc-800 bg-zinc-950 sticky top-0 z-50 backdrop-blur-md bg-opacity-90">
-        <h1 className="text-xl font-bold">ghifar<span className="text-orange-500">mkcy</span>.</h1>
-        <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 text-zinc-400 hover:text-white transition-colors">
-          <Menu />
-        </button>
-      </div>
-
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <Sidebar 
-            activeView={activeView} 
-            onNavigate={setActiveView} 
-            mobile 
-            onCloseMobile={() => setMobileMenuOpen(false)} 
-        />
-      )}
+      {/* Mobile Navigation - Fixed at bottom */}
+      <MobileNav 
+        activeView={activeView} 
+        onNavigate={setActiveView} 
+        onAddClick={() => setIsAddModalOpen(true)}
+      />
 
       {/* Main Content */}
       <main className="md:pl-64 min-h-screen transition-all duration-300">
-        <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
+        <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 pb-32"> {/* Increased bottom padding for Mobile Nav */}
           
           {/* Page Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 animate-in fade-in slide-in-from-top-4 duration-700 delay-100">
              <div>
-               <h2 className="text-3xl font-bold text-white capitalize tracking-tight">{profile?.language === 'id' && activeView === 'overview' ? 'Ringkasan' : activeView}</h2>
-               <p className="text-zinc-400 mt-1">
+               <h2 className="text-2xl md:text-3xl font-bold text-white capitalize tracking-tight">{profile?.language === 'id' && activeView === 'overview' ? 'Ringkasan' : activeView}</h2>
+               <p className="text-zinc-400 mt-1 text-sm md:text-base">
                  {activeView === 'overview' && t?.welcome}
                  {activeView === 'transactions' && t?.manageTx}
                  {activeView === 'budgeting' && t?.trackBudget}
@@ -581,12 +591,12 @@ const AppContent = () => {
              </div>
              
              {/* Actions Area */}
-             <div className="flex items-center gap-4">
+             <div className="flex items-center gap-4 w-full md:w-auto">
                 {activeView !== 'settings' && (
-                  <DateRangePicker id="tour-filter" date={dateRange} setDate={setDateRange} />
+                  <DateRangePicker id="tour-filter" date={dateRange} setDate={setDateRange} className="w-full md:w-auto" />
                 )}
 
-                <button className="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 relative transition-all hover:scale-105 hover:text-white group">
+                <button className="hidden md:block p-2 rounded-full hover:bg-zinc-800 text-zinc-400 relative transition-all hover:scale-105 hover:text-white group">
                    <Bell size={20} className="group-hover:animate-pulse" />
                    <span className="absolute top-1.5 right-2 w-2 h-2 bg-orange-500 rounded-full border border-zinc-950"></span>
                 </button>

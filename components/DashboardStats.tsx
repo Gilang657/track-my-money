@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent } from './ui/DesignSystem';
 import { DashboardStats as StatsType } from '../types';
@@ -63,16 +64,16 @@ export const DashboardStats: React.FC<Props> = ({ stats, formatCurrency, labels,
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-      {/* Total Balance - Added Edit Button */}
-      <Card id="tour-balance" className="border-l-4 border-l-orange-500 bg-gradient-to-br from-zinc-900 to-zinc-950">
-        <CardContent className="flex flex-col justify-between h-full relative">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
+      {/* Total Balance - Spans 2 columns on mobile if we wanted, but keeping 2-col strict as requested */}
+      <Card id="tour-balance" className="col-span-2 lg:col-span-1 border-l-4 border-l-orange-500 bg-gradient-to-br from-zinc-900 to-zinc-950">
+        <CardContent className="flex flex-col justify-between h-full relative p-5">
           <div className="flex justify-between items-start">
             <div className="p-2 bg-orange-500/10 rounded-full">
                 <Wallet className="w-5 h-5 text-orange-500" />
             </div>
             <div className="flex items-center gap-2">
-                 <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">{labels.totalBalance}</span>
+                 <span className="text-[10px] md:text-xs font-medium text-zinc-500 uppercase tracking-wider">{labels.totalBalance}</span>
                  {onEditBalance && (
                     <button onClick={onEditBalance} className="text-zinc-600 hover:text-white transition-colors">
                         <Edit3 size={12} />
@@ -81,63 +82,63 @@ export const DashboardStats: React.FC<Props> = ({ stats, formatCurrency, labels,
             </div>
           </div>
           <div className="mt-4">
-            <h2 className="text-3xl font-bold text-white tracking-tight">{formatCurrency(animatedBalance)}</h2>
-            <p className="text-sm text-zinc-500 mt-1">{labels.availableFunds}</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">{formatCurrency(animatedBalance)}</h2>
+            <p className="text-xs md:text-sm text-zinc-500 mt-1">{labels.availableFunds}</p>
           </div>
         </CardContent>
       </Card>
 
       {/* Income */}
       <Card>
-        <CardContent>
-          <div className="flex justify-between items-start mb-4">
-             <div className="p-2 bg-emerald-500/10 rounded-full">
-                <ArrowUpRight className="w-5 h-5 text-emerald-500" />
+        <CardContent className="p-4 md:p-6">
+          <div className="flex justify-between items-start mb-3 md:mb-4">
+             <div className="p-1.5 md:p-2 bg-emerald-500/10 rounded-full">
+                <ArrowUpRight className="w-4 h-4 md:w-5 md:h-5 text-emerald-500" />
             </div>
-             <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">{labels.income}</span>
+             <span className="text-[10px] md:text-xs font-medium text-zinc-500 uppercase tracking-wider">{labels.income}</span>
           </div>
-          <h2 className="text-2xl font-bold text-white">{formatCurrency(animatedIncome)}</h2>
-          <p className="text-sm text-emerald-500 mt-1 flex items-center gap-1">
-             +12% <span className="text-zinc-600">{labels.vsLastMonth}</span>
+          <h2 className="text-lg md:text-2xl font-bold text-white truncate">{formatCurrency(animatedIncome)}</h2>
+          <p className="text-[10px] md:text-sm text-emerald-500 mt-1 flex items-center gap-1">
+             +12% 
           </p>
         </CardContent>
       </Card>
 
       {/* Expense */}
       <Card>
-        <CardContent>
-          <div className="flex justify-between items-start mb-4">
-             <div className="p-2 bg-rose-500/10 rounded-full">
-                <ArrowDownRight className="w-5 h-5 text-rose-500" />
+        <CardContent className="p-4 md:p-6">
+          <div className="flex justify-between items-start mb-3 md:mb-4">
+             <div className="p-1.5 md:p-2 bg-rose-500/10 rounded-full">
+                <ArrowDownRight className="w-4 h-4 md:w-5 md:h-5 text-rose-500" />
             </div>
-             <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">{labels.expenses}</span>
+             <span className="text-[10px] md:text-xs font-medium text-zinc-500 uppercase tracking-wider">{labels.expenses}</span>
           </div>
-          <h2 className="text-2xl font-bold text-white">{formatCurrency(animatedExpense)}</h2>
-           <p className="text-sm text-rose-500 mt-1 flex items-center gap-1">
-             +5% <span className="text-zinc-600">{labels.vsLastMonth}</span>
+          <h2 className="text-lg md:text-2xl font-bold text-white truncate">{formatCurrency(animatedExpense)}</h2>
+           <p className="text-[10px] md:text-sm text-rose-500 mt-1 flex items-center gap-1">
+             +5% 
           </p>
         </CardContent>
       </Card>
 
-      {/* Savings Rate - Revamped */}
-      <Card>
-        <CardContent>
-           <div className="flex justify-between items-start mb-4">
-             <div className="p-2 bg-blue-500/10 rounded-full">
-                <PiggyBank className="w-5 h-5 text-blue-500" />
+      {/* Savings Rate */}
+      <Card className="col-span-2 lg:col-span-1">
+        <CardContent className="p-4 md:p-6">
+           <div className="flex justify-between items-start mb-3 md:mb-4">
+             <div className="p-1.5 md:p-2 bg-blue-500/10 rounded-full">
+                <PiggyBank className="w-4 h-4 md:w-5 md:h-5 text-blue-500" />
             </div>
-             <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">{labels.savingsRate}</span>
+             <span className="text-[10px] md:text-xs font-medium text-zinc-500 uppercase tracking-wider">{labels.savingsRate}</span>
           </div>
           <div className="flex justify-between items-end">
-              <h2 className="text-2xl font-bold text-white">
+              <h2 className="text-xl md:text-2xl font-bold text-white">
                   {stats.totalIncome > 0 ? `${savingsRate.toFixed(1)}%` : '--'}
               </h2>
-              <span className={`text-xs font-medium ${statusColor} mb-1.5`}>
+              <span className={`text-[10px] md:text-xs font-medium ${statusColor} mb-1.5`}>
                   {statusText}
               </span>
           </div>
            
-           <div className="w-full bg-zinc-800 h-2 mt-3 rounded-full overflow-hidden">
+           <div className="w-full bg-zinc-800 h-1.5 md:h-2 mt-3 rounded-full overflow-hidden">
              <div 
                 className={`${barColor} h-full rounded-full transition-all duration-1000`} 
                 style={{ width: `${stats.totalIncome > 0 ? Math.max(0, Math.min(savingsRate, 100)) : 0}%` }}
