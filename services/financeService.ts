@@ -32,8 +32,11 @@ export const financeService = {
     
     const stored = localStorage.getItem(TX_STORAGE_KEY);
     if (!stored) {
-      localStorage.setItem(TX_STORAGE_KEY, JSON.stringify(INITIAL_TRANSACTIONS));
-      return INITIAL_TRANSACTIONS;
+      // If we are truly in a "Real Account" flow (handled by App.tsx clearing data), 
+      // this returns empty array instead of initial mock data to avoid leakage.
+      // However, for the very first load of the app, we might want INITIAL_TRANSACTIONS.
+      // Given the "Demo Leakage" requirement, we return empty if nothing is found after a clear.
+      return []; 
     }
     return JSON.parse(stored);
   },
@@ -117,16 +120,11 @@ export const financeService = {
   },
 
   clearLocalSession: () => {
-    // IMPORTANT: In this local-only version, we treat LocalStorage as the Database.
-    // We do NOT want to delete the user's data (Settings, Transactions, Budgets) on Logout.
-    // We only want to clear session-specific things if any.
-    
-    // Uncommenting these lines would "Reset" the account, which causes the onboarding to reappear.
-    // localStorage.removeItem(SETTINGS_STORAGE_KEY);
-    // localStorage.removeItem(TX_STORAGE_KEY);
-    // localStorage.removeItem(BUDGET_STORAGE_KEY);
-    
-    console.log("Session cleared (Data persisted locally)");
+    // Force clear all data to prevent Demo Leakage
+    localStorage.removeItem(SETTINGS_STORAGE_KEY);
+    localStorage.removeItem(TX_STORAGE_KEY);
+    localStorage.removeItem(BUDGET_STORAGE_KEY);
+    console.log("Local Data Wiped (Demo Isolation)");
   },
 
   injectDemoData: async () => {

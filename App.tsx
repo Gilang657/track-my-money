@@ -1,13 +1,14 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { Bell, Loader2, CheckCircle2, User, Settings, BellRing, Database, ChevronRight, LogOut, Shield, Play, Menu } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion'; // Task 4: Transitions
 import { DashboardStats } from './components/DashboardStats';
 import { Analytics } from './components/Analytics';
 import { TransactionList } from './components/TransactionList';
 import { TransactionForm } from './components/TransactionForm';
 import { BudgetView } from './components/BudgetView';
 import { Sidebar } from './components/Sidebar';
-import { MobileNav } from './components/MobileNav'; // Import New Mobile Nav
+import { MobileNav } from './components/MobileNav'; 
 import { DateRangePicker } from './components/ui/DateRangePicker'; 
 import { OnboardingWizard } from './components/OnboardingWizard'; 
 import { AppTour } from './components/AppTour'; 
@@ -19,9 +20,21 @@ import { TRANSLATIONS } from './constants';
 import { Card, CardContent, CardHeader, CardTitle, Button, Input, Switch, Badge, Separator, Dialog } from './components/ui/DesignSystem';
 import { UserProvider, useUser } from './contexts/UserContext';
 import { supabase } from './lib/supabase';
-import { Session } from '@supabase/supabase-js';
 
 type View = 'overview' | 'transactions' | 'budgeting' | 'settings';
+
+// Helper for Task 1: Format numbers with dots (e.g. 1.000.000)
+const formatNumberString = (value: string) => {
+    // Remove non-digit characters
+    const cleanValue = value.replace(/\D/g, '');
+    // Add dots every 3 digits
+    return cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
+
+// Helper for Task 1: Parse back to number
+const parseFormattedNumber = (value: string) => {
+    return parseFloat(value.replace(/\./g, '')) || 0;
+};
 
 // Inner App Component to consume Context (only rendered when authenticated)
 const AppContent = () => {
@@ -41,7 +54,6 @@ const AppContent = () => {
   const [dataLoading, setDataLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [settingsLoading, setSettingsLoading] = useState(false);
-  // Removed old mobileMenuOpen state
   const [activeView, setActiveView] = useState<View>('overview');
   const [toast, setToast] = useState<{message: string, visible: boolean}>({ message: '', visible: false });
 
@@ -117,9 +129,10 @@ const AppContent = () => {
     }
   };
 
+  // Task 1: Fix Initial Balance Save Logic
   const handleSaveInitialBalance = async () => {
      if (!profile) return;
-     const num = parseFloat(tempBalance) || 0;
+     const num = parseFormattedNumber(tempBalance); // Parse the formatted string
      try {
          await updateProfile({ ...profile, initialBalance: num });
          setIsBalanceModalOpen(false);
@@ -129,8 +142,10 @@ const AppContent = () => {
      }
   };
 
+  // Task 1: Pre-format existing balance when opening modal
   const openBalanceModal = () => {
-      setTempBalance(profile?.initialBalance?.toString() || '');
+      const initial = profile?.initialBalance?.toString() || '';
+      setTempBalance(formatNumberString(initial));
       setIsBalanceModalOpen(true);
   };
 
@@ -138,6 +153,17 @@ const AppContent = () => {
      if(confirm("This will overwrite your current data with demo data. Continue?")) {
          await financeService.injectDemoData();
      }
+  };
+
+  const handleLogout = async () => {
+    try {
+        await supabase.auth.signOut();
+        financeService.clearLocalSession();
+        // Force refresh to clear state
+        window.location.reload();
+    } catch (error) {
+        console.error("Logout failed", error);
+    }
   };
 
   // --- Helpers & Filtering ---
@@ -220,7 +246,7 @@ const AppContent = () => {
     );
 
     return (
-      <div className="flex flex-col lg:flex-row gap-8 h-full min-h-[600px] animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex flex-col lg:flex-row gap-8 h-full min-h-[600px] animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
         {/* Settings Navigation */}
         <div className="w-full lg:w-64 flex flex-col gap-2 shrink-0">
           <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider px-4 mb-2">General</h3>
@@ -393,6 +419,14 @@ const AppContent = () => {
                      </div>
                   </div>
                )}
+               
+               {/* Task 2: Logout Button on Mobile (via Settings) */}
+               <div className="block md:hidden pt-8">
+                  <Button variant="danger" type="button" className="w-full h-12" onClick={handleLogout}>
+                     <LogOut size={18} className="mr-2" />
+                     {t.signOut}
+                  </Button>
+               </div>
 
             </form>
           </div>
@@ -513,7 +547,7 @@ const AppContent = () => {
       {/* Product Tour - Shown if complete but not seen */}
       <AppTour />
 
-      {/* Initial Balance Modal */}
+      {/* Initial Balance Modal (Task 1: Updated to use text input with mask) */}
       <Dialog 
         open={isBalanceModalOpen} 
         onOpenChange={setIsBalanceModalOpen} 
@@ -522,10 +556,11 @@ const AppContent = () => {
         <div className="space-y-4">
             <p className="text-sm text-zinc-400">{t.initialBalanceDesc}</p>
             <Input 
-                type="number" 
+                type="text" // Changed to text for formatting
+                inputMode="numeric"
                 value={tempBalance} 
-                onChange={e => setTempBalance(e.target.value)}
-                placeholder="0.00"
+                onChange={e => setTempBalance(formatNumberString(e.target.value))}
+                placeholder="0"
                 autoFocus
             />
             <div className="flex justify-end gap-2 pt-2">
@@ -615,7 +650,7 @@ const AppContent = () => {
 
 // Root App Wraps Content handling Session
 const App = () => {
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSession] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAuth, setShowAuth] = useState(false);
 
@@ -638,7 +673,13 @@ const App = () => {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      // Task 3: Fix Demo Data Leakage
+      // If a user logs in (real session), we must ensure LocalStorage (which might hold demo data) is cleared
+      // so we don't display "Fake" data to a "Real" user.
+      if (event === 'SIGNED_IN') {
+         financeService.clearLocalSession();
+      }
       setSession(session);
       setLoading(false);
     });
@@ -654,18 +695,45 @@ const App = () => {
     );
   }
 
-  // Gatekeeper: If no session, show Landing Page or Auth Page
-  if (!session) {
-    if (showAuth) {
-        return <AuthPage onBack={() => setShowAuth(false)} />;
-    }
-    return <LandingPage onStart={() => setShowAuth(true)} />;
-  }
-
+  // Task 4: Page Transitions using AnimatePresence
   return (
-    <UserProvider>
-      <AppContent />
-    </UserProvider>
+    <AnimatePresence mode="wait">
+      {!session ? (
+         showAuth ? (
+             <motion.div 
+                key="auth"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+             >
+                <AuthPage onBack={() => setShowAuth(false)} />
+             </motion.div>
+         ) : (
+             <motion.div 
+                key="landing"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+             >
+                <LandingPage onStart={() => setShowAuth(true)} />
+             </motion.div>
+         )
+      ) : (
+        <motion.div 
+           key="app"
+           initial={{ opacity: 0 }}
+           animate={{ opacity: 1 }}
+           exit={{ opacity: 0 }}
+           transition={{ duration: 0.5 }}
+        >
+            <UserProvider>
+                <AppContent />
+            </UserProvider>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
