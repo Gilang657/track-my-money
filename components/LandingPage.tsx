@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Code, Database, Layout, Smartphone, Github, Instagram, Linkedin, Globe, Wallet, PieChart, Coins, CreditCard, ExternalLink } from 'lucide-react';
+import { Code, Database, Layout, Smartphone, Github, Instagram, Linkedin, Globe, Wallet, PieChart, Coins, CreditCard, ExternalLink, ArrowRight } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
 // --- Reusable Component for Framer Motion Reveal ---
@@ -78,17 +78,19 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         "Real-time Analytics", "Aman & Privat", "Tanpa Iklan", "Mobile First", "Export CSV", "Smart Budgeting", "Multi-Currency", "Dark Mode"
       ],
       features: {
-        title: "Fitur yang Anda Butuhkan",
-        subtitle: "Lihat langsung bagaimana ghifarmkcy bekerja.",
-        bento: {
-            analytics: "Analisis Mendalam",
-            analyticsDesc: "Grafik interaktif memvisualisasikan arus kas Anda.",
-            budget: "Anggaran Pintar",
-            budgetDesc: "Setel batas bulanan agar tidak boncos.",
-            secure: "Privasi Terjamin",
-            secureDesc: "Data Anda milik Anda. Aman.",
-            speed: "Mobile First",
-            speedDesc: "Akses cepat dari mana saja."
+        title: "Satu Akun. Semua Perangkat.",
+        subtitle: "Pengalaman finansial yang mulus di Desktop dan Mobile.",
+        desktop: {
+            title: "Kontrol Penuh di Desktop",
+            desc: "Nikmati dashboard luas dengan analitik mendetail di layar besar Anda. Ideal untuk perencanaan bulanan."
+        },
+        mobile: {
+            title: "Desain Mobile First",
+            desc: "Kelola keuangan saat bepergian. Navigasi satu jempol yang terasa seperti aplikasi native."
+        },
+        analytics: {
+            title: "Analitik Cerdas",
+            desc: "Grafik interaktif yang memahami pola belanja Anda."
         }
       },
       about: {
@@ -129,17 +131,19 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         "Real-time Analytics", "Secure & Private", "No Ads", "Mobile First", "Export CSV", "Smart Budgeting", "Multi-Currency", "Dark Mode"
       ],
       features: {
-        title: "Features You Need",
-        subtitle: "See exactly how ghifarmkcy works.",
-        bento: {
-            analytics: "Deep Analytics",
-            analyticsDesc: "Interactive charts visualize your cash flow.",
-            budget: "Smart Budgeting",
-            budgetDesc: "Set monthly limits to stay on track.",
-            secure: "Secure Privacy",
-            secureDesc: "Your data is yours. Secure.",
-            speed: "Mobile First",
-            speedDesc: "Fast access from anywhere."
+        title: "One Account. Any Device.",
+        subtitle: "A seamless financial experience across Desktop and Mobile.",
+        desktop: {
+            title: "Full Control on Desktop",
+            desc: "Experience the full dashboard with detailed analytics on your big screen. Perfect for deep dives."
+        },
+        mobile: {
+            title: "Mobile First Design",
+            desc: "Manage finances on the go with a native-app feel. Optimized for one-thumb navigation."
+        },
+        analytics: {
+            title: "Smart Analytics",
+            desc: "Interactive charts that understand your spending patterns."
         }
       },
       about: {
@@ -216,7 +220,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
                  playsInline 
                  className="w-full h-full object-cover"
              >
-                 <source src="/video/1.mp4" type="video/mp4" />
+                 <source src="/3.mp4" type="video/mp4" />
                  {/* Fallback color if video fails */}
                  <div className="w-full h-full bg-[#050505]"></div>
              </video>
@@ -364,54 +368,73 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
          <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#050505] to-transparent z-10"></div>
       </div>
 
-      {/* --- IMAGE-FIRST BENTO GRID FEATURES --- */}
+      {/* --- REFACTORED FEATURES SECTION (DEVICE SHOWCASE) --- */}
       <section className="py-32 px-6 bg-[#0a0a0a]">
           <div className="max-w-7xl mx-auto">
              <RevealOnScroll className="text-center mb-20">
                 <h2 className="text-4xl md:text-5xl font-bold mb-4">{t.features.title}</h2>
-                <p className="text-zinc-400 text-lg">{t.features.subtitle}</p>
+                <p className="text-zinc-400 text-lg max-w-2xl mx-auto">{t.features.subtitle}</p>
              </RevealOnScroll>
 
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
+             {/* Bento Grid with Device Frames */}
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                  
-                 {/* 1. Analytics (Large) - Enter Left */}
-                 <ScrollSlideIn direction="left" className="md:col-span-2 row-span-1" delay={0.1}>
-                    <BentoCard 
-                        title={t.features.bento.analytics}
-                        desc={t.features.bento.analyticsDesc}
-                        imgSrc="/photo/1.png"
-                        className="h-full"
-                    />
+                 {/* Card 1: Desktop (Wide) */}
+                 <ScrollSlideIn direction="left" className="md:col-span-2 min-h-[400px] md:min-h-[500px]" delay={0.1}>
+                    <FeatureCard 
+                        title={t.features.desktop.title}
+                        desc={t.features.desktop.desc}
+                    >
+                         <LaptopMockup imgSrc="/1.png" />
+                    </FeatureCard>
                  </ScrollSlideIn>
 
-                 {/* 2. Security (Small) - Enter Up */}
-                 <ScrollSlideIn direction="up" className="md:col-span-1" delay={0.2}>
-                     <BentoCard 
-                        title={t.features.bento.secure}
-                        desc={t.features.bento.secureDesc}
-                        imgSrc="/photo/4.png"
+                 {/* Card 2: Mobile (Tall - Vertical) */}
+                 <ScrollSlideIn direction="right" className="md:col-span-1 md:row-span-2 min-h-[500px]" delay={0.2}>
+                     <FeatureCard 
+                        title={t.features.mobile.title}
+                        desc={t.features.mobile.desc}
                         className="h-full"
-                    />
+                    >
+                        <PhoneMockup imgSrc="/2.png" />
+                    </FeatureCard>
                  </ScrollSlideIn>
 
-                 {/* 3. Speed/Mobile (Small) - Enter Up */}
-                 <ScrollSlideIn direction="up" className="md:col-span-1" delay={0.3}>
-                     <BentoCard 
-                        title={t.features.bento.speed}
-                        desc={t.features.bento.speedDesc}
-                        imgSrc="/photo/3.png"
-                        className="h-full"
-                    />
-                 </ScrollSlideIn>
-
-                 {/* 4. Budget (Large) - Enter Right */}
-                 <ScrollSlideIn direction="right" className="md:col-span-2" delay={0.4}>
-                     <BentoCard 
-                        title={t.features.bento.budget}
-                        desc={t.features.bento.budgetDesc}
-                        imgSrc="/photo/2.png"
-                        className="h-full"
-                    />
+                 {/* Card 3: Analytics (Wide to fill gap) */}
+                 <ScrollSlideIn direction="up" className="md:col-span-2 min-h-[300px]" delay={0.3}>
+                     <FeatureCard 
+                        title={t.features.analytics.title}
+                        desc={t.features.analytics.desc}
+                        className="flex flex-col md:flex-row items-center !p-0"
+                     >
+                        {/* Text Side */}
+                        <div className="p-8 md:w-1/2 z-10">
+                            <h3 className="text-2xl font-bold text-white mb-2">{t.features.analytics.title}</h3>
+                            <p className="text-zinc-400 text-sm leading-relaxed">{t.features.analytics.desc}</p>
+                            <div className="mt-4 text-orange-500 font-medium flex items-center gap-2 cursor-pointer hover:underline">
+                                Explore Analytics <ArrowRight size={16}/>
+                            </div>
+                        </div>
+                        {/* Visual Side */}
+                        <div className="flex-1 w-full h-full relative min-h-[200px] overflow-hidden bg-gradient-to-br from-zinc-900 to-black/50">
+                             <div className="absolute inset-4 opacity-80">
+                                 {/* CSS Chart */}
+                                 <div className="flex items-end gap-2 h-full w-full pb-4 px-4">
+                                    {[30, 50, 40, 70, 50, 80, 60, 90, 70, 100].map((h, i) => (
+                                        <div 
+                                            key={i} 
+                                            className="flex-1 bg-orange-500/20 rounded-t-sm hover:bg-orange-500 transition-all duration-300 relative group"
+                                            style={{ height: `${h}%` }}
+                                        >
+                                            <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                                {h}%
+                                            </div>
+                                        </div>
+                                    ))}
+                                 </div>
+                             </div>
+                        </div>
+                    </FeatureCard>
                  </ScrollSlideIn>
              </div>
           </div>
@@ -528,6 +551,89 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
 // --- HELPER COMPONENTS ---
 
+const FeatureCard = ({ title, desc, className = "", children }: { title: string, desc: string, className?: string, children: React.ReactNode }) => (
+    <div className={`relative overflow-hidden rounded-3xl bg-zinc-900/50 border border-white/10 group shadow-lg ${className}`}>
+        <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+        
+        {/* Only show default text layout if not customized (like Analytics card) */}
+        {!className.includes('!p-0') && (
+            <div className="relative z-10 p-8 pb-0 flex flex-col h-full">
+                <div className="mb-6 z-20">
+                    <h3 className="text-2xl font-bold text-white mb-2">{title}</h3>
+                    <p className="text-zinc-400 text-sm leading-relaxed max-w-sm">{desc}</p>
+                </div>
+                <div className="flex-1 relative flex items-end justify-center">
+                    {children}
+                </div>
+            </div>
+        )}
+        {/* Render children directly if custom layout is used */}
+        {className.includes('!p-0') && children}
+    </div>
+);
+
+const LaptopMockup = ({ imgSrc }: { imgSrc: string }) => (
+    <div className="relative w-[90%] mx-auto translate-y-6 group-hover:translate-y-2 transition-transform duration-700 ease-out z-10">
+        {/* Lid */}
+        <div className="relative bg-[#1a1a1a] rounded-t-xl border border-zinc-700 p-2 shadow-2xl ring-1 ring-white/5">
+            {/* Screen */}
+            <div className="bg-black rounded-lg overflow-hidden aspect-[16/10] relative border border-white/5">
+                 <img 
+                    src={imgSrc} 
+                    alt="Desktop Demo"
+                    className="w-full h-full object-cover object-top"
+                    onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                    }}
+                 />
+                 {/* Fallback */}
+                 <div className="hidden absolute inset-0 bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center">
+                    <Layout className="w-16 h-16 text-zinc-700" />
+                 </div>
+            </div>
+            {/* Camera Dot */}
+            <div className="absolute top-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-black rounded-full ring-1 ring-zinc-700"></div>
+        </div>
+        {/* Base */}
+        <div className="absolute -bottom-3 inset-x-0 h-3 bg-[#2a2a2a] rounded-b-xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] border-t border-black/50 mx-4"></div>
+    </div>
+);
+
+const PhoneMockup = ({ imgSrc }: { imgSrc: string }) => (
+    <div className="relative w-[65%] sm:w-[55%] mx-auto translate-y-8 group-hover:translate-y-4 transition-transform duration-700 ease-out z-10">
+        <div className="bg-[#1a1a1a] rounded-[2.5rem] p-2 border border-zinc-700 shadow-2xl ring-1 ring-white/5">
+            <div className="bg-black rounded-[2rem] overflow-hidden aspect-[9/19] relative border-[4px] border-black">
+                 <img 
+                    src={imgSrc} 
+                    alt="Mobile Demo"
+                    className="w-full h-full object-cover object-top"
+                    onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                    }}
+                 />
+                 {/* Fallback */}
+                 <div className="hidden absolute inset-0 bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center">
+                    <Smartphone className="w-12 h-12 text-zinc-700" />
+                 </div>
+                 
+                 {/* Notch */}
+                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-b-2xl z-20 flex justify-center items-start pt-1">
+                    <div className="w-12 h-1.5 bg-zinc-800/50 rounded-full"></div>
+                 </div>
+                 
+                 {/* Home Indicator */}
+                 <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1/3 h-1 bg-white/20 rounded-full z-20"></div>
+            </div>
+            {/* Side Buttons */}
+            <div className="absolute top-20 -right-1 w-1 h-8 bg-zinc-700 rounded-r-md"></div>
+            <div className="absolute top-20 -left-1 w-1 h-8 bg-zinc-700 rounded-l-md"></div>
+            <div className="absolute top-32 -left-1 w-1 h-12 bg-zinc-700 rounded-l-md"></div>
+        </div>
+    </div>
+);
+
 const BadgeIcon = ({ icon, label }: { icon: React.ReactNode, label: string }) => (
     <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 text-zinc-300 text-xs font-medium hover:bg-white/10 hover:border-white/20 transition-all cursor-default">
         {icon} {label}
@@ -545,41 +651,6 @@ const SocialButton = ({ icon, label, href }: { icon: React.ReactNode, label: str
         <span className="font-semibold">{label}</span>
         <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-opacity -ml-1" />
     </a>
-);
-
-const BentoCard = ({ title, desc, imgSrc, className = "" }: { title: string, desc: string, imgSrc: string, className?: string }) => (
-    <div className={`group relative overflow-hidden rounded-3xl bg-zinc-900/40 border border-white/5 hover:bg-zinc-900/60 hover:border-orange-500/20 transition-all duration-500 ${className}`}>
-        
-        {/* Image Container with 3D Tilt Effect */}
-        <div className="absolute inset-0 z-0 overflow-hidden">
-             {/* The image is offset and rotated, then straightens on hover */}
-            <div className="absolute top-[20%] -left-[10%] w-[120%] h-[120%] transform rotate-6 translate-y-12 group-hover:rotate-0 group-hover:translate-y-0 group-hover:left-0 group-hover:top-0 group-hover:w-full group-hover:h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1)]">
-                 <img 
-                    src={imgSrc} 
-                    onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                    }}
-                    alt={title} 
-                    className="w-full h-full object-cover object-left-top opacity-50 group-hover:opacity-100 transition-opacity duration-500 shadow-2xl" 
-                 />
-                 {/* Fallback Placeholder (shown if image fails load) */}
-                 <div className="hidden absolute inset-0 bg-zinc-900 flex flex-col items-center justify-center text-zinc-600 text-xs font-mono p-4 text-center border border-white/5">
-                    <div className="mb-2 p-2 bg-white/5 rounded-full"><Layout /></div>
-                    <span className="opacity-50">Image not found:</span>
-                    <span className="text-orange-500 font-bold mt-1">{imgSrc}</span>
-                 </div>
-            </div>
-        </div>
-        
-        {/* Content Overlay */}
-        <div className="relative z-10 p-8 h-full flex flex-col justify-end pointer-events-none bg-gradient-to-t from-black/90 via-black/40 to-transparent">
-            <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                <h3 className="text-2xl font-bold text-white mb-2 drop-shadow-lg">{title}</h3>
-             <p className="text-zinc-300 text-sm max-w-xs drop-shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">{desc}</p>
-            </div>
-        </div>
-    </div>
 );
 
 const FloatingElement = ({ children, className }: { children: React.ReactNode, className: string }) => (
