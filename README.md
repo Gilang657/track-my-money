@@ -22,7 +22,7 @@ Experience the app live here:
 ## Features
 
 ### Cinematic User Experience
-- **High-Performance Landing Page:** Featuring a video background and "GTA VI-style" directional scroll animations powered by `framer-motion`.
+- **High-Performance Landing Page:** Featuring a video background directional scroll animations powered by `framer-motion`.
 - **Seamless Transitions:** Smooth page transitions between Landing, Login, and Dashboard views.
 
 ### Native-Grade Mobile Optimization
