@@ -1,4 +1,4 @@
-# ghifarmkcy Personal Finance Tracker
+# Ghifarmkcy Personal Finance Tracker
 
 ![Project Banner](public/4.png)
 
