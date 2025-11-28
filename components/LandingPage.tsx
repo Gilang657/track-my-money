@@ -129,7 +129,7 @@ export const LandingPage = ({ onStart, onEnterDemo }: Props) => {
       hero: {
         titlePrefix: "Master Your",
         titleSuffix: "Money Flow.",
-        desc: "Not just an expense tracker. It's your personal financial command center. Secure cloud data or instant local demo mode.",
+        desc: "Manage and optimize your personal finances with a structured analytical system. Your data is securely stored in our database, or you can try the instant demo mode.",
         ctaMain: "Login / Register",
         ctaSec: "Demo Mode (No Login)"
       },
