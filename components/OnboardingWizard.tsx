@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, Button, Input } from './ui/DesignSystem';
 import { UserProfile, CurrencyCode, Language } from '../types';
@@ -46,10 +47,14 @@ export const OnboardingWizard: React.FC<Props> = ({ onFinish }) => {
         monthlyBudgetGoal: budgetNum
       };
 
+      // Ensure this awaits the DB update
       await updateProfile(newProfile);
+      
+      // Only call finish after successful DB update
       onFinish();
     } catch (error) {
-      console.error(error);
+      console.error("Onboarding Save Failed:", error);
+      alert("Failed to save profile. Please try again.");
     } finally {
       setLoading(false);
     }
