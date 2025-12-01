@@ -42,7 +42,7 @@ Experience the app live here:
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Category | Technology |
 |----------|------------|
